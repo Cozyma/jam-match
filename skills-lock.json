@@ -1,0 +1,55 @@
+{
+  "version": 3,
+  "skills": {
+    "nextjs-app-router-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "d2f0a7065f7418fdb3ae88559f1f1426f40c26f2b5aebcd394797418d4bb3b04"
+    },
+    "nextjs-app-router-fundamentals": {
+      "source": "wsimmonds/claude-nextjs-skills",
+      "sourceType": "github",
+      "computedHash": "2d73efbbc227187a78d547d80e7e778d179048d592530dc9f69c8307eee6ae76"
+    },
+    "tailwind-css-patterns": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "computedHash": "a9d14dbb31901e53f37a33cf4d7495da95c66781dc67fe62b3e70a944bd050e0"
+    },
+    "eslint-prettier-config": {
+      "source": "patricio0312rev/skills",
+      "sourceType": "github",
+      "computedHash": "dd1365afc6c06f6c8555d0624669e70c6873057da70a92b045e948329dc1b906"
+    },
+    "api-security-best-practices": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "ce16d10df486a28a3ba894d646de3243fc2bf9990f563fc7a9b074fd720e24d5"
+    },
+    "sse-streaming": {
+      "source": "dadbodgeoff/drift",
+      "sourceType": "github",
+      "computedHash": "650e918fb35b48c5133aeb93746fe2602af0c8c304650a1b2b2388deb576caab"
+    },
+    "supabase-postgres-best-practices": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "computedHash": "ccd6e4596bd51cf344fe76c464867c541ccc16b6d90ae7a9db449fb17588613b"
+    },
+    "nextjs-supabase-auth": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "4f50bad1d6b0723f17cd9f18ed059028d68456b511dc9c9b341ffa5111c5241a"
+    },
+    "supabase-backend-platform": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "computedHash": "1404df0204b1d5b33b933ca4446deb0576bbfa8eee21c5f943fed86c67c0b1df"
+    },
+    "supabase-nextjs": {
+      "source": "alinaqi/claude-bootstrap",
+      "sourceType": "github",
+      "computedHash": "587988eafbe1669f60a118297414e48a5e8632557666f0784c2073ec0778154b"
+    }
+  }
+}

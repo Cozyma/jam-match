@@ -1,0 +1,253 @@
+"use client"
+
+import * as React from "react"
+import { Music2 } from "lucide-react"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
+
+interface SongRegisterSheetProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  songTitle: string
+  songKey: string
+  onRegister?: (data: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }) => void
+}
+
+const instruments = [
+  { value: "guitar", label: "Guitar", icon: "🎸" },
+  { value: "banjo", label: "Banjo", icon: "🪕" },
+  { value: "mandolin", label: "Mandolin", icon: "🎸" },
+  { value: "fiddle", label: "Fiddle", icon: "🎻" },
+  { value: "bass", label: "Bass", icon: "🎸" },
+  { value: "dobro", label: "Dobro", icon: "🎸" },
+  { value: "other", label: "Other", icon: "🎵" },
+]
+
+const vocalOptions = [
+  { value: "lead", label: "Lead" },
+  { value: "harmony_high", label: "Harmony (High)" },
+  { value: "harmony_low", label: "Harmony (Low)" },
+  { value: "none", label: "なし" },
+]
+
+const keys = ["C", "D", "E", "F", "G", "A", "B♭", "B"]
+
+const proficiencyOptions = [
+  {
+    value: "ready",
+    label: "いつでもOK",
+    icon: "◎",
+    dotColor: "bg-emerald-500",
+    description: "いつでも演奏できます",
+  },
+  {
+    value: "with_practice",
+    label: "練習すればOK",
+    icon: "○",
+    dotColor: "bg-amber-500",
+    description: "少し練習が必要です",
+  },
+  {
+    value: "learning",
+    label: "挑戦中",
+    icon: "△",
+    dotColor: "bg-stone-400",
+    description: "現在練習中です",
+  },
+]
+
+export function SongRegisterSheet({
+  open,
+  onOpenChange,
+  songTitle,
+  songKey,
+  onRegister,
+}: SongRegisterSheetProps) {
+  const [selectedInstrument, setSelectedInstrument] = React.useState<string>("")
+  const [selectedVocal, setSelectedVocal] = React.useState<string>("none")
+  const [selectedKeys, setSelectedKeys] = React.useState<string[]>([])
+  const [selectedProficiency, setSelectedProficiency] = React.useState<string>("")
+
+  const handleRegister = () => {
+    if (onRegister) {
+      onRegister({
+        part: selectedInstrument,
+        vocal: selectedVocal,
+        preferred_keys: selectedKeys,
+        proficiency: selectedProficiency,
+      })
+    }
+    onOpenChange(false)
+  }
+
+  const toggleKey = (key: string) => {
+    setSelectedKeys(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    )
+  }
+
+  const isValid = selectedInstrument && selectedProficiency
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="h-[85vh] overflow-y-auto rounded-t-2xl" aria-describedby={undefined}>
+        <SheetHeader className="border-b border-stone-200 pb-4">
+          <div className="flex items-center justify-between">
+            <SheetTitle className="text-lg">レパートリーに追加</SheetTitle>
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center gap-2">
+              <Music2 className="h-5 w-5 text-amber-700" />
+              <span className="font-medium text-foreground">{songTitle}</span>
+            </div>
+            <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-0">
+              Key: {songKey}
+            </Badge>
+          </div>
+        </SheetHeader>
+
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+          {/* Part Selection */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-foreground">
+              パート <span className="text-red-500">*</span>
+            </Label>
+            <RadioGroup
+              value={selectedInstrument}
+              onValueChange={setSelectedInstrument}
+              className="grid grid-cols-4 gap-2"
+            >
+              {instruments.map((instrument) => (
+                <Label
+                  key={instrument.value}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-3 rounded-lg border cursor-pointer transition-all",
+                    selectedInstrument === instrument.value
+                      ? "border-amber-700 bg-amber-50 text-amber-900"
+                      : "border-stone-200 bg-white hover:border-stone-300"
+                  )}
+                >
+                  <RadioGroupItem
+                    value={instrument.value}
+                    className="sr-only"
+                  />
+                  <span className="text-xl mb-1">{instrument.icon}</span>
+                  <span className="text-xs text-center">{instrument.label}</span>
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
+
+          {/* Vocal Selection */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-foreground">ボーカル</Label>
+            <RadioGroup
+              value={selectedVocal}
+              onValueChange={setSelectedVocal}
+              className="grid grid-cols-2 gap-2"
+            >
+              {vocalOptions.map((option) => (
+                <Label
+                  key={option.value}
+                  className={cn(
+                    "flex items-center justify-center p-3 rounded-lg border cursor-pointer transition-all",
+                    selectedVocal === option.value
+                      ? "border-amber-700 bg-amber-50 text-amber-900"
+                      : "border-stone-200 bg-white hover:border-stone-300"
+                  )}
+                >
+                  <RadioGroupItem
+                    value={option.value}
+                    className="sr-only"
+                  />
+                  <span className="text-sm">{option.label}</span>
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
+
+          {/* Preferred Keys - plain buttons instead of ToggleGroup */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-foreground">得意キー</Label>
+            <div className="flex flex-wrap gap-2">
+              {keys.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => toggleKey(key)}
+                  className={cn(
+                    "px-4 py-2 rounded-full border text-sm font-medium transition-all",
+                    selectedKeys.includes(key)
+                      ? "bg-amber-700 text-white border-amber-700"
+                      : "bg-white text-stone-700 border-stone-200 hover:border-stone-300"
+                  )}
+                >
+                  {key}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Proficiency Selection */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-foreground">
+              習熟度 <span className="text-red-500">*</span>
+            </Label>
+            <RadioGroup
+              value={selectedProficiency}
+              onValueChange={setSelectedProficiency}
+              className="space-y-2"
+            >
+              {proficiencyOptions.map((option) => (
+                <Label
+                  key={option.value}
+                  className={cn(
+                    "flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all",
+                    selectedProficiency === option.value
+                      ? "border-amber-700 bg-amber-50"
+                      : "border-stone-200 bg-white hover:border-stone-300"
+                  )}
+                >
+                  <RadioGroupItem
+                    value={option.value}
+                    className="sr-only"
+                  />
+                  <span className={cn("w-3 h-3 rounded-full", option.dotColor)} />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{option.icon}</span>
+                      <span className="font-medium text-foreground">{option.label}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {option.description}
+                    </p>
+                  </div>
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
+        </div>
+
+        <SheetFooter className="border-t border-stone-200 pt-4">
+          <Button
+            onClick={handleRegister}
+            disabled={!isValid}
+            className="w-full bg-amber-700 hover:bg-amber-800 text-white disabled:bg-stone-300 disabled:text-stone-500"
+          >
+            登録する
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  )
+}

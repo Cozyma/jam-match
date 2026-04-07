@@ -1,3 +1,4 @@
+-- 曲マスター
 INSERT INTO songs (title, has_vocal, main_instrument, tempo, original_key) VALUES
 -- トラディショナル / スタンダード
 ('Foggy Mountain Breakdown', false, 'banjo', 'fast', 'G'),
@@ -52,10 +53,92 @@ INSERT INTO songs (title, has_vocal, main_instrument, tempo, original_key) VALUE
 ('Bury Me Beneath the Willow', true, 'guitar', 'slow', 'G')
 ON CONFLICT (title) DO NOTHING;
 
--- テストユーザー（Auth APIで作成後、profilesに登録）
--- email: test.user@gmail.com / password: testpass
--- Auth側のユーザー作成は supabase/seed-auth.sh で実行
-INSERT INTO profiles (id, display_name, main_part)
-SELECT id, 'テストユーザー', 'guitar'
-FROM auth.users WHERE email = 'test.user@gmail.com'
+-- テストユーザー（auth.users + profiles を一括作成）
+-- user1: test.user@gmail.com / testpass (Guitar)
+-- user2: tanaka@example.com / testpass (Banjo)
+-- user3: suzuki@example.com / testpass (Fiddle)
+
+INSERT INTO auth.users (
+  id, instance_id, aud, role, email, encrypted_password,
+  email_confirmed_at, created_at, updated_at,
+  raw_app_meta_data, raw_user_meta_data, is_super_admin
+) VALUES
+  (
+    'a1111111-1111-1111-1111-111111111111',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated', 'authenticated',
+    'test.user@gmail.com',
+    crypt('testpass', gen_salt('bf')),
+    now(), now(), now(),
+    '{"provider":"email","providers":["email"]}',
+    '{"full_name":"テストユーザー"}',
+    false
+  ),
+  (
+    'a2222222-2222-2222-2222-222222222222',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated', 'authenticated',
+    'tanaka@example.com',
+    crypt('testpass', gen_salt('bf')),
+    now(), now(), now(),
+    '{"provider":"email","providers":["email"]}',
+    '{"full_name":"田中太郎"}',
+    false
+  ),
+  (
+    'a3333333-3333-3333-3333-333333333333',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated', 'authenticated',
+    'suzuki@example.com',
+    crypt('testpass', gen_salt('bf')),
+    now(), now(), now(),
+    '{"provider":"email","providers":["email"]}',
+    '{"full_name":"鈴木花子"}',
+    false
+  )
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO auth.identities (
+  id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at
+) VALUES
+  ('a1111111-1111-1111-1111-111111111111', 'a1111111-1111-1111-1111-111111111111', 'test.user@gmail.com', 'email', '{"sub":"a1111111-1111-1111-1111-111111111111","email":"test.user@gmail.com"}', now(), now(), now()),
+  ('a2222222-2222-2222-2222-222222222222', 'a2222222-2222-2222-2222-222222222222', 'tanaka@example.com', 'email', '{"sub":"a2222222-2222-2222-2222-222222222222","email":"tanaka@example.com"}', now(), now(), now()),
+  ('a3333333-3333-3333-3333-333333333333', 'a3333333-3333-3333-3333-333333333333', 'suzuki@example.com', 'email', '{"sub":"a3333333-3333-3333-3333-333333333333","email":"suzuki@example.com"}', now(), now(), now())
+;
+
+INSERT INTO profiles (id, display_name, main_part) VALUES
+  ('a1111111-1111-1111-1111-111111111111', 'テストユーザー', 'guitar'),
+  ('a2222222-2222-2222-2222-222222222222', '田中太郎', 'banjo'),
+  ('a3333333-3333-3333-3333-333333333333', '鈴木花子', 'fiddle')
+ON CONFLICT (id) DO NOTHING;
+
+-- テスト用レパートリー
+INSERT INTO user_repertoires (user_id, song_id, part, vocal, proficiency, is_favorite)
+SELECT 'a1111111-1111-1111-1111-111111111111', id, 'guitar', 'lead', 'ready', true
+FROM songs WHERE title IN ('Foggy Mountain Breakdown', 'Rocky Top', 'Will the Circle Be Unbroken', 'Wagon Wheel', 'I''ll Fly Away')
+ON CONFLICT (user_id, song_id) DO NOTHING;
+
+INSERT INTO user_repertoires (user_id, song_id, part, vocal, proficiency, is_favorite)
+SELECT 'a1111111-1111-1111-1111-111111111111', id, 'guitar', 'none', 'with_practice', false
+FROM songs WHERE title IN ('Cripple Creek', 'Old Joe Clark', 'Amazing Grace')
+ON CONFLICT (user_id, song_id) DO NOTHING;
+
+INSERT INTO user_repertoires (user_id, song_id, part, vocal, proficiency, is_favorite)
+SELECT 'a2222222-2222-2222-2222-222222222222', id, 'banjo', 'none', 'ready', true
+FROM songs WHERE title IN ('Foggy Mountain Breakdown', 'Cripple Creek', 'Rocky Top', 'Gold Rush')
+ON CONFLICT (user_id, song_id) DO NOTHING;
+
+INSERT INTO user_repertoires (user_id, song_id, part, vocal, proficiency, is_favorite)
+SELECT 'a2222222-2222-2222-2222-222222222222', id, 'banjo', 'harmony_high', 'with_practice', false
+FROM songs WHERE title IN ('Will the Circle Be Unbroken', 'Wagon Wheel')
+ON CONFLICT (user_id, song_id) DO NOTHING;
+
+INSERT INTO user_repertoires (user_id, song_id, part, vocal, proficiency, is_favorite)
+SELECT 'a3333333-3333-3333-3333-333333333333', id, 'fiddle', 'none', 'ready', false
+FROM songs WHERE title IN ('Foggy Mountain Breakdown', 'Rocky Top', 'Orange Blossom Special', 'Old Joe Clark')
+ON CONFLICT (user_id, song_id) DO NOTHING;
+
+INSERT INTO user_repertoires (user_id, song_id, part, vocal, proficiency, is_favorite)
+SELECT 'a3333333-3333-3333-3333-333333333333', id, 'fiddle', 'harmony_low', 'learning', false
+FROM songs WHERE title IN ('Will the Circle Be Unbroken', 'Amazing Grace')
+ON CONFLICT (user_id, song_id) DO NOTHING;

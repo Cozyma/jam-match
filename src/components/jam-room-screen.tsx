@@ -11,6 +11,7 @@ import { useRoom, useRoomMembers } from "@/hooks/use-room"
 import { useMatching } from "@/hooks/use-matching"
 import type { MatchLevel, MatchedSong } from "@/hooks/use-matching"
 import { useAuth } from "@/hooks/use-auth"
+import { usePlayedSongs } from "@/hooks/use-played-songs"
 
 interface JamRoomScreenProps {
   roomId?: string
@@ -103,6 +104,14 @@ export function JamRoomScreen({ roomId, roomCode, expiresAt }: JamRoomScreenProp
   const { members, loading: membersLoading } = useRoomMembers(roomId)
   const currentMatchLevel = (matchLevel[0] || "normal") as MatchLevel
   const { songs: matchedSongs, loading: matchingLoading } = useMatching(roomId, currentMatchLevel)
+  const { playedSongIds, markPlayed, unmarkPlayed } = usePlayedSongs(roomId)
+
+  // 未演奏を上、演奏済みを下にソート
+  const sortedSongs = [...matchedSongs].sort((a, b) => {
+    const aPlayed = playedSongIds.has(a.id) ? 1 : 0
+    const bPlayed = playedSongIds.has(b.id) ? 1 : 0
+    return aPlayed - bPlayed
+  })
 
   const displayCode = roomCode || "------"
 
@@ -177,13 +186,32 @@ export function JamRoomScreen({ roomId, roomCode, expiresAt }: JamRoomScreenProp
           <h2 className="text-sm font-semibold text-stone-700">
             {matchingLoading ? "読み込み中..." : `共通曲: ${matchedSongs.length}曲`}
           </h2>
+          {playedSongIds.size > 0 && (
+            <span className="text-xs text-stone-400">{playedSongIds.size}曲 演奏済み</span>
+          )}
         </div>
 
         {/* Song List */}
         <div className="flex flex-col gap-3">
-          {matchedSongs.map((song) => (
-            <SongCard key={song.id} song={mapMatchedSongToCard(song)} />
-          ))}
+          {sortedSongs.map((song) => {
+            const isPlayed = playedSongIds.has(song.id)
+            return (
+              <div key={song.id} className={isPlayed ? "opacity-50" : ""}>
+                <SongCard
+                  song={mapMatchedSongToCard(song)}
+                  isPlayed={isPlayed}
+                  onTogglePlayed={() => {
+                    if (!user) return
+                    if (isPlayed) {
+                      unmarkPlayed(song.id)
+                    } else {
+                      markPlayed(song.id, user.id)
+                    }
+                  }}
+                />
+              </div>
+            )
+          })}
         </div>
       </main>
 

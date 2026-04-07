@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Star, ChevronDown } from "lucide-react"
+import { Star, ChevronDown, CheckCircle2 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -48,9 +48,11 @@ const proficiencyColors: Record<Proficiency, string> = {
 
 interface SongCardProps {
   song: SongCardData
+  isPlayed?: boolean
+  onTogglePlayed?: () => void
 }
 
-export function SongCard({ song }: SongCardProps) {
+export function SongCard({ song, isPlayed, onTogglePlayed }: SongCardProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -61,10 +63,32 @@ export function SongCard({ song }: SongCardProps) {
             {/* Top row: Title and Key */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-1 min-w-0">
+                {onTogglePlayed && (
+                  <button
+                    type="button"
+                    className="shrink-0"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onTogglePlayed()
+                    }}
+                  >
+                    <CheckCircle2
+                      className={cn(
+                        "h-4 w-4 transition-colors",
+                        isPlayed
+                          ? "fill-emerald-500 text-emerald-500"
+                          : "text-stone-300 hover:text-stone-400"
+                      )}
+                    />
+                  </button>
+                )}
                 {song.favoriteCount && song.favoriteCount > 0 ? (
                   <Star className="h-3.5 w-3.5 shrink-0 fill-amber-500 text-amber-500" />
                 ) : null}
-                <h3 className="text-sm font-semibold leading-tight text-stone-800 truncate">
+                <h3 className={cn(
+                  "text-sm font-semibold leading-tight truncate",
+                  isPlayed ? "text-stone-400 line-through" : "text-stone-800"
+                )}>
                   {song.title}
                 </h3>
               </div>

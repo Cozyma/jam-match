@@ -103,6 +103,52 @@ export type Database = {
           },
         ]
       }
+      room_played_songs: {
+        Row: {
+          id: string
+          room_id: string
+          song_id: string
+          marked_by: string
+          played_at: string | null
+        }
+        Insert: {
+          id?: string
+          room_id: string
+          song_id: string
+          marked_by: string
+          played_at?: string | null
+        }
+        Update: {
+          id?: string
+          room_id?: string
+          song_id?: string
+          marked_by?: string
+          played_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_played_songs_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_played_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_played_songs_marked_by_fkey"
+            columns: ["marked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rooms: {
         Row: {
           code: string

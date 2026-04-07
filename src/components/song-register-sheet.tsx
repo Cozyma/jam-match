@@ -149,66 +149,49 @@ export function SongRegisterSheet({
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
-          {/* Part Selection */}
-          <div className="space-y-3">
+          {/* Part Selection (1タップ=メイン, 2タップ=サブトグル) */}
+          <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">
               パート <span className="text-red-500">*</span>
+              {selectedInstrument && (
+                <span className="ml-2 font-normal text-xs text-muted-foreground">他をタップでサブ追加</span>
+              )}
             </Label>
-            <RadioGroup
-              value={selectedInstrument}
-              onValueChange={(v) => {
-                setSelectedInstrument(v)
-                setSelectedSubParts(prev => prev.filter(p => p !== v))
-              }}
-              className="grid grid-cols-4 gap-2"
-            >
-              {instruments.map((instrument) => (
-                <Label
-                  key={instrument.value}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-lg border cursor-pointer transition-all",
-                    selectedInstrument === instrument.value
-                      ? "border-amber-700 bg-amber-50 text-amber-900"
-                      : "border-stone-200 bg-white hover:border-stone-300"
-                  )}
-                >
-                  <RadioGroupItem
-                    value={instrument.value}
-                    className="sr-only"
-                  />
-                  <span className="text-xl mb-1">{instrument.icon}</span>
-                  <span className="text-xs text-center">{instrument.label}</span>
-                </Label>
-              ))}
-            </RadioGroup>
-          </div>
-
-          {/* Sub Parts Selection */}
-          {selectedInstrument && (
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-foreground">サブパート</Label>
-              <div className="grid grid-cols-4 gap-2">
-                {instruments
-                  .filter(i => i.value !== selectedInstrument)
-                  .map((instrument) => (
-                    <button
-                      key={instrument.value}
-                      type="button"
-                      onClick={() => toggleSubPart(instrument.value)}
-                      className={cn(
-                        "flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all",
-                        selectedSubParts.includes(instrument.value)
-                          ? "border-stone-500 bg-stone-50 text-stone-800"
+            <div className="grid grid-cols-4 gap-1.5">
+              {instruments.map((instrument) => {
+                const isMain = selectedInstrument === instrument.value
+                const isSub = selectedSubParts.includes(instrument.value)
+                return (
+                  <button
+                    key={instrument.value}
+                    type="button"
+                    onClick={() => {
+                      if (!selectedInstrument || isMain) {
+                        // メイン未選択 or メインを再タップ → メインに設定
+                        setSelectedInstrument(instrument.value)
+                        setSelectedSubParts(prev => prev.filter(p => p !== instrument.value))
+                      } else {
+                        // メイン選択済み + 別の楽器 → サブをトグル
+                        toggleSubPart(instrument.value)
+                      }
+                    }}
+                    className={cn(
+                      "flex flex-col items-center justify-center p-2 rounded-lg border transition-all",
+                      isMain
+                        ? "border-amber-700 bg-amber-50 text-amber-900"
+                        : isSub
+                          ? "border-stone-500 bg-stone-50 text-stone-700"
                           : "border-stone-200 bg-white text-stone-400 hover:border-stone-300"
-                      )}
-                    >
-                      <span className="text-lg mb-0.5">{instrument.icon}</span>
-                      <span className="text-[10px] text-center">{instrument.label}</span>
-                    </button>
-                  ))}
-              </div>
+                    )}
+                  >
+                    <span className="text-lg">{instrument.icon}</span>
+                    <span className="text-[10px] text-center leading-tight">{instrument.label}</span>
+                    {isMain && <span className="text-[9px] text-amber-600 font-medium">MAIN</span>}
+                  </button>
+                )
+              })}
             </div>
-          )}
+          </div>
 
           {/* Vocal Selection (歌あり曲のみ) */}
           {hasVocal && <div className="space-y-3">

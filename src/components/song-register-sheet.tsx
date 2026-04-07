@@ -193,7 +193,7 @@ export function SongRegisterSheet({
             </div>
           </div>
 
-          {/* Vocal Selection (歌あり曲のみ) */}
+          {/* Vocal + Preferred Keys (歌あり曲のみ) */}
           {hasVocal && <div className="space-y-3">
             <Label className="text-sm font-medium text-foreground">ボーカル</Label>
             <RadioGroup
@@ -219,28 +219,28 @@ export function SongRegisterSheet({
                 </Label>
               ))}
             </RadioGroup>
-          </div>}
-
-          {/* Preferred Keys (歌あり曲のみ) */}
-          {hasVocal && <div className="space-y-3">
-            <Label className="text-sm font-medium text-foreground">得意キー</Label>
-            <div className="flex flex-wrap gap-2">
-              {keys.map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => toggleKey(key)}
-                  className={cn(
-                    "px-4 py-2 rounded-full border text-sm font-medium transition-all",
-                    selectedKeys.includes(key)
-                      ? "bg-amber-700 text-white border-amber-700"
-                      : "bg-white text-stone-700 border-stone-200 hover:border-stone-300"
-                  )}
-                >
-                  {key}
-                </button>
-              ))}
-            </div>
+            {selectedVocal && selectedVocal !== "none" && (
+              <div className="space-y-2 pl-3 border-l-2 border-amber-200">
+                <Label className="text-xs font-medium text-muted-foreground">得意キー</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {keys.map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => toggleKey(key)}
+                      className={cn(
+                        "px-3 py-1 rounded-full border text-xs font-medium transition-all",
+                        selectedKeys.includes(key)
+                          ? "bg-amber-700 text-white border-amber-700"
+                          : "bg-white text-stone-700 border-stone-200 hover:border-stone-300"
+                      )}
+                    >
+                      {key}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>}
 
           {/* Proficiency Selection */}

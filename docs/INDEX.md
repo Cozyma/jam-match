@@ -27,6 +27,7 @@ tags: [Index, ドキュメント]
 | `docs/design/detailed/` | **設計（詳細）**<br>処理フロー・実装詳細。 | #設計 #実装 |
 | `docs/database/` | **データベース**<br>Supabase スキーマドキュメント。 | #データベース |
 | `docs/operations-guide/` | **運用ガイド**<br>運用手順、テストデータ作成手順など。 | #運用 |
+| `docs/operations-guide/deployment.md` | **デプロイガイド**<br>Vercel + Supabase Cloud の本番デプロイ手順。 | #運用 #デプロイ |
 | `docs/POLICY.md` | **開発ポリシー**<br>仕様駆動+Issue駆動の開発ワークフロー、SSOT原則、コミット規約、ブランチ命名規則。 | #規約 #ポリシー #ワークフロー |
 | `docs/guidelines/development-guide.md` | **開発ガイド**<br>開発フローの具体例付き実践ガイド（画面追加・DB変更・Realtime）。 | #ガイド #開発フロー #具体例 |
 | `docs/design/decisions/_template.md` | **ADRテンプレート**<br>設計判断記録のテンプレート。 | #ADR #テンプレート |

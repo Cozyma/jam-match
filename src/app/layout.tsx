@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,12 +16,15 @@ export const metadata: Metadata = {
   title: "Bluegrass GONG - Bluegrass Jam Sessions",
   description: "Find musicians and jam together",
   manifest: "/manifest.json",
-  themeColor: "#b45309",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Bluegrass GONG",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#b45309",
 };
 
 export default function RootLayout({

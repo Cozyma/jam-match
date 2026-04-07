@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Music, Home, Guitar, User } from "lucide-react"
+import { Home, Guitar, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useProfile } from "@/hooks/use-profile"
@@ -56,9 +56,7 @@ export function AppLayout({ children, activeTab = "home" }: AppLayoutProps) {
       {/* Header */}
       <header className="sticky top-0 z-50 flex h-14 items-center border-b border-border bg-card px-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Music className="h-4 w-4 text-primary-foreground" />
-          </div>
+          <img src="/icon-192.png" alt="Bluegrass GONG" className="h-8 w-8 rounded-lg" />
           <span className="text-lg font-semibold text-foreground">Bluegrass GONG</span>
         </div>
       </header>

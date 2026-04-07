@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Music } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -61,9 +60,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
       <Card className="w-full max-w-sm">
         <CardHeader className="flex flex-col items-center gap-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
-            <Music className="h-8 w-8 text-primary-foreground" />
-          </div>
+          <img src="/icon-192.png" alt="Bluegrass GONG" className="h-16 w-16 rounded-2xl" />
           <div>
             <h1 className="text-2xl font-bold text-foreground">Bluegrass GONG</h1>
             <p className="mt-2 text-sm text-muted-foreground">

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JamMatch - Bluegrass Jam Sessions",
+  title: "Bluegrass GONG - Bluegrass Jam Sessions",
   description: "Find musicians and jam together",
 };
 

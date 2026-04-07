@@ -75,7 +75,7 @@ Create a mobile app layout shell for a bluegrass jam session app using shadcn/ui
 Theme: amber-700 primary, stone-50 background.
 
 **Header:**
-- App name "JamMatch" with a music note icon, left-aligned
+- App name "Bluegrass GONG" with a music note icon, left-aligned
 - Clean, minimal
 
 **Bottom Navigation (3 tabs):**
@@ -93,7 +93,7 @@ Show the layout with placeholder content area. Mobile viewport 375px.
 ## 4. ホーム画面
 
 ```
-Create a mobile home screen for a bluegrass jam session app called "JamMatch" using shadcn/ui and Tailwind CSS.
+Create a mobile home screen for a bluegrass jam session app called "Bluegrass GONG" using shadcn/ui and Tailwind CSS.
 
 Theme: warm woody - amber-700 primary, stone-50 background, white cards.
 

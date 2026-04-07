@@ -65,7 +65,7 @@ export default function LoginPage() {
             <Music className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">JamMatch</h1>
+            <h1 className="text-2xl font-bold text-foreground">Bluegrass GONG</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               ブルーグラスジャムセッションを見つけよう
             </p>

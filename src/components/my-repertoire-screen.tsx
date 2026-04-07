@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Star, Trash2 } from "lucide-react"
+import { useState, useMemo } from "react"
+import { Star, Trash2, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { PartIcon, partConfig } from "@/components/icons/part-icon"
@@ -30,6 +30,12 @@ export function MyRepertoireScreen() {
   const { user } = useAuth()
   const { repertoire, loading, updateRepertoire, removeRepertoire } = useRepertoire(user?.id)
   const { songs } = useSongs()
+
+  // Filter & Sort
+  const [profFilter, setProfFilter] = useState<string | null>(null)
+  const [partFilter, setPartFilter] = useState<string | null>(null)
+  const [favOnly, setFavOnly] = useState(false)
+  const [sortBy, setSortBy] = useState<"favorite" | "title" | "proficiency" | "date">("favorite")
 
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editingEntry, setEditingEntry] = useState<{
@@ -82,19 +88,132 @@ export function MyRepertoireScreen() {
     )
   }
 
-  const sortedRepertoire = [...repertoire].sort((a, b) => {
-    if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1
-    return 0
-  })
+  const profOrder: Record<string, number> = { ready: 0, with_practice: 1, learning: 2 }
+
+  const filteredAndSorted = useMemo(() => {
+    let list = [...repertoire]
+
+    // Filters
+    if (profFilter) list = list.filter(e => e.proficiency === profFilter)
+    if (partFilter) list = list.filter(e => e.part === partFilter)
+    if (favOnly) list = list.filter(e => e.is_favorite)
+
+    // Sort
+    list.sort((a, b) => {
+      switch (sortBy) {
+        case "favorite":
+          if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1
+          return 0
+        case "title": {
+          const ta = songsMap.get(a.song_id)?.title || ""
+          const tb = songsMap.get(b.song_id)?.title || ""
+          return ta.localeCompare(tb)
+        }
+        case "proficiency":
+          return (profOrder[a.proficiency] ?? 9) - (profOrder[b.proficiency] ?? 9)
+        case "date":
+          return (b.created_at || "").localeCompare(a.created_at || "")
+        default:
+          return 0
+      }
+    })
+
+    return list
+  }, [repertoire, profFilter, partFilter, favOnly, sortBy, songsMap])
+
+  // パート選択肢（実際に使われているパートのみ）
+  const usedParts = useMemo(() => {
+    const parts = new Set(repertoire.map(e => e.part))
+    return Array.from(parts).sort()
+  }, [repertoire])
+
+  const sortOptions = [
+    { value: "favorite", label: "★" },
+    { value: "title", label: "A-Z" },
+    { value: "proficiency", label: "◎○△" },
+    { value: "date", label: "新着" },
+  ] as const
 
   return (
     <div className="flex flex-col">
-      <div className="px-4 py-2 text-sm text-muted-foreground">
-        {repertoire.length}曲 登録済み
+      {/* Filter & Sort Bar */}
+      <div className="border-b border-border bg-card px-4 py-2 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {filteredAndSorted.length}/{repertoire.length}曲
+          </span>
+          {/* Sort */}
+          <div className="flex items-center gap-1">
+            <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
+            {sortOptions.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setSortBy(opt.value)}
+                className={cn(
+                  "px-2 py-0.5 text-xs rounded transition-colors",
+                  sortBy === opt.value
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Filters */}
+        <div className="flex items-center gap-1 flex-wrap">
+          {/* Fav filter */}
+          <button
+            type="button"
+            onClick={() => setFavOnly(!favOnly)}
+            className={cn(
+              "px-2 py-0.5 text-xs rounded border transition-colors",
+              favOnly
+                ? "border-amber-500 bg-amber-50 text-amber-700"
+                : "border-transparent text-muted-foreground hover:bg-muted"
+            )}
+          >
+            ★のみ
+          </button>
+          {/* Proficiency filter */}
+          {proficiencyLevels.map((level) => (
+            <button
+              key={level.value}
+              type="button"
+              onClick={() => setProfFilter(profFilter === level.value ? null : level.value)}
+              className={cn(
+                "px-2 py-0.5 text-xs rounded border transition-colors",
+                profFilter === level.value
+                  ? level.activeBg
+                  : "border-transparent text-muted-foreground hover:bg-muted"
+              )}
+            >
+              {level.label}
+            </button>
+          ))}
+          {/* Part filter */}
+          {usedParts.map((part) => (
+            <button
+              key={part}
+              type="button"
+              onClick={() => setPartFilter(partFilter === part ? null : part)}
+              className={cn(
+                "rounded border transition-colors",
+                partFilter === part
+                  ? "border-stone-500"
+                  : "border-transparent"
+              )}
+            >
+              <PartIcon part={part} size="sm" />
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {sortedRepertoire.map((entry, index) => {
+        {filteredAndSorted.map((entry, index) => {
           const song = songsMap.get(entry.song_id)
 
           const vocalLabel = entry.vocal === "lead" ? "Lead" : entry.vocal === "harmony_high" ? "Har(H)" : entry.vocal === "harmony_low" ? "Har(L)" : null
@@ -164,7 +283,7 @@ export function MyRepertoireScreen() {
                   </div>
                 </div>
               </div>
-              {index < sortedRepertoire.length - 1 && (
+              {index < filteredAndSorted.length - 1 && (
                 <div className="mx-4 border-b border-border" />
               )}
             </div>

@@ -1,18 +1,45 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Share2, Users } from "lucide-react"
+import { ArrowLeft, Clock, Share2, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { SongMiniCard } from "@/components/song-mini-card"
-import { useRoomMembers } from "@/hooks/use-room"
+import { useRoom, useRoomMembers } from "@/hooks/use-room"
 import { useMatching } from "@/hooks/use-matching"
 import type { MatchLevel, MatchedSong } from "@/hooks/use-matching"
+import { useAuth } from "@/hooks/use-auth"
 
 interface JamRoomScreenProps {
   roomId?: string
   roomCode?: string
+  expiresAt?: string
+}
+
+function useRemainingTime(expiresAt: string | undefined) {
+  const [remaining, setRemaining] = useState("")
+
+  useEffect(() => {
+    if (!expiresAt) return
+
+    function update() {
+      const diff = new Date(expiresAt!).getTime() - Date.now()
+      if (diff <= 0) {
+        setRemaining("期限切れ")
+        return
+      }
+      const hours = Math.floor(diff / (1000 * 60 * 60))
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      setRemaining(`残り ${hours}時間${minutes}分`)
+    }
+
+    update()
+    const timer = setInterval(update, 60_000)
+    return () => clearInterval(timer)
+  }, [expiresAt])
+
+  return remaining
 }
 
 const partIconMap: Record<string, string> = {
@@ -65,8 +92,11 @@ function mapMatchedSongToCard(song: MatchedSong) {
   }
 }
 
-export function JamRoomScreen({ roomId, roomCode }: JamRoomScreenProps) {
+export function JamRoomScreen({ roomId, roomCode, expiresAt }: JamRoomScreenProps) {
   const router = useRouter()
+  const { user } = useAuth()
+  const { leaveRoom } = useRoom()
+  const remainingTime = useRemainingTime(expiresAt)
   const [matchLevel, setMatchLevel] = useState<readonly string[]>(["normal"])
   const { members, loading: membersLoading } = useRoomMembers(roomId)
   const currentMatchLevel = (matchLevel[0] || "normal") as MatchLevel
@@ -92,7 +122,15 @@ export function JamRoomScreen({ roomId, roomCode }: JamRoomScreenProps) {
             <h1 className="text-base font-semibold text-stone-800">
               Room: {displayCode}
             </h1>
-            <p className="text-xs text-stone-500">参加者: {members.length}人</p>
+            <p className="text-xs text-stone-500">
+              参加者: {members.length}人
+              {remainingTime && (
+                <span className="ml-2 inline-flex items-center gap-0.5">
+                  <Clock className="h-3 w-3" />
+                  {remainingTime}
+                </span>
+              )}
+            </p>
           </div>
           <Button variant="ghost" size="icon" className="h-9 w-9 text-stone-600">
             <Share2 className="h-5 w-5" />
@@ -160,7 +198,12 @@ export function JamRoomScreen({ roomId, roomCode }: JamRoomScreenProps) {
           <Button
             variant="outline"
             className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-            onClick={() => router.push("/")}
+            onClick={async () => {
+              if (roomId && user) {
+                await leaveRoom(roomId, user.id)
+              }
+              router.push("/")
+            }}
           >
             退出
           </Button>

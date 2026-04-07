@@ -1,14 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, Clock } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { useAuth } from "@/hooks/use-auth"
 import { useRepertoire } from "@/hooks/use-repertoire"
+import { useMyRooms } from "@/hooks/use-room"
 
 export function HomeScreen() {
   const { user } = useAuth()
   const { repertoire } = useRepertoire(user?.id)
+  const { rooms: myRooms } = useMyRooms(user?.id)
 
   const repertoireCount = repertoire.length
 
@@ -41,6 +43,40 @@ export function HomeScreen() {
           href="/room/create"
         />
       </div>
+
+      {myRooms.length > 0 && (
+        <div className="mt-8">
+          <h2 className="mb-3 text-sm font-semibold text-foreground">参加中のルーム</h2>
+          <div className="flex flex-col gap-2">
+            {myRooms.map((rm) => {
+              const room = (rm as any).rooms
+              const expiresAt = room.expires_at ? new Date(room.expires_at) : null
+              const hoursLeft = expiresAt ? Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60))) : null
+              return (
+                <Link key={rm.id} href={`/room/${room.id}`}>
+                  <Card className="cursor-pointer rounded-lg border-0 bg-card p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.98]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono text-sm font-semibold text-primary">{room.code}</span>
+                        {room.name && <span className="text-sm text-foreground">{room.name}</span>}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {hoursLeft !== null && (
+                          <span className="inline-flex items-center gap-0.5">
+                            <Clock className="h-3 w-3" />
+                            {hoursLeft}h
+                          </span>
+                        )}
+                        <ChevronRight className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

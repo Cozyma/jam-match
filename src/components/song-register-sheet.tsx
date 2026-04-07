@@ -21,6 +21,8 @@ interface SongRegisterSheetProps {
   songTitle: string
   songKey: string
   onRegister?: (data: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }) => void
+  initialValues?: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }
+  mode?: "register" | "edit"
 }
 
 const instruments = [
@@ -72,11 +74,27 @@ export function SongRegisterSheet({
   songTitle,
   songKey,
   onRegister,
+  initialValues,
+  mode = "register",
 }: SongRegisterSheetProps) {
-  const [selectedInstrument, setSelectedInstrument] = React.useState<string>("")
-  const [selectedVocal, setSelectedVocal] = React.useState<string>("none")
-  const [selectedKeys, setSelectedKeys] = React.useState<string[]>([])
-  const [selectedProficiency, setSelectedProficiency] = React.useState<string>("")
+  const [selectedInstrument, setSelectedInstrument] = React.useState<string>(initialValues?.part || "")
+  const [selectedVocal, setSelectedVocal] = React.useState<string>(initialValues?.vocal || "none")
+  const [selectedKeys, setSelectedKeys] = React.useState<string[]>(initialValues?.preferred_keys || [])
+  const [selectedProficiency, setSelectedProficiency] = React.useState<string>(initialValues?.proficiency || "")
+
+  React.useEffect(() => {
+    if (open && initialValues) {
+      setSelectedInstrument(initialValues.part)
+      setSelectedVocal(initialValues.vocal)
+      setSelectedKeys(initialValues.preferred_keys)
+      setSelectedProficiency(initialValues.proficiency)
+    } else if (open && !initialValues) {
+      setSelectedInstrument("")
+      setSelectedVocal("none")
+      setSelectedKeys([])
+      setSelectedProficiency("")
+    }
+  }, [open, initialValues])
 
   const handleRegister = () => {
     if (onRegister) {
@@ -103,7 +121,7 @@ export function SongRegisterSheet({
       <SheetContent side="bottom" className="h-[85vh] overflow-y-auto rounded-t-2xl" aria-describedby={undefined}>
         <SheetHeader className="border-b border-stone-200 pb-4">
           <div className="flex items-center justify-between">
-            <SheetTitle className="text-lg">レパートリーに追加</SheetTitle>
+            <SheetTitle className="text-lg">{mode === "edit" ? "レパートリーを編集" : "レパートリーに追加"}</SheetTitle>
           </div>
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center gap-2">
@@ -244,7 +262,7 @@ export function SongRegisterSheet({
             disabled={!isValid}
             className="w-full bg-amber-700 hover:bg-amber-800 text-white disabled:bg-stone-300 disabled:text-stone-500"
           >
-            登録する
+            {mode === "edit" ? "更新する" : "登録する"}
           </Button>
         </SheetFooter>
       </SheetContent>

@@ -39,6 +39,20 @@ export function useRepertoire(userId: string | undefined) {
     return { data, error }
   }, [])
 
+  const updateRepertoire = useCallback(async (id: string, item: Partial<Omit<RepertoireInsert, 'id' | 'user_id' | 'song_id' | 'created_at' | 'updated_at'>>) => {
+    const { data, error } = await supabase
+      .from('user_repertoires')
+      .update({ ...item, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) console.error('Failed to update repertoire:', error)
+    if (data) {
+      setRepertoire(prev => prev.map(r => r.id === id ? data : r))
+    }
+    return { data, error }
+  }, [])
+
   const removeRepertoire = useCallback(async (id: string) => {
     const { error } = await supabase
       .from('user_repertoires')
@@ -51,5 +65,5 @@ export function useRepertoire(userId: string | undefined) {
     return { error }
   }, [])
 
-  return { repertoire, loading, addRepertoire, removeRepertoire }
+  return { repertoire, loading, addRepertoire, updateRepertoire, removeRepertoire }
 }

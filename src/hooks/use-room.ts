@@ -67,7 +67,46 @@ export function useRoom() {
     return { room, error: joinError }
   }, [])
 
-  return { createRoom, joinRoom }
+  const leaveRoom = useCallback(async (roomId: string, userId: string) => {
+    const { error } = await supabase
+      .from('room_members')
+      .delete()
+      .eq('room_id', roomId)
+      .eq('user_id', userId)
+
+    if (error) console.error('Failed to leave room:', error)
+    return { error }
+  }, [])
+
+  return { createRoom, joinRoom, leaveRoom }
+}
+
+export function useMyRooms(userId: string | undefined) {
+  const [rooms, setRooms] = useState<(RoomMember & { rooms: Room })[]>([])
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
+
+  useEffect(() => {
+    if (!userId) return
+    async function fetch() {
+      const { data, error } = await supabase
+        .from('room_members')
+        .select('*, rooms(*)')
+        .eq('user_id', userId!)
+        .order('joined_at', { ascending: false })
+      if (error) console.error('Failed to fetch my rooms:', error)
+      if (data) {
+        const active = (data as any[]).filter(d =>
+          d.rooms && (!d.rooms.expires_at || new Date(d.rooms.expires_at) > new Date())
+        )
+        setRooms(active as any)
+      }
+      setLoading(false)
+    }
+    fetch()
+  }, [userId])
+
+  return { rooms, loading }
 }
 
 export function useRoomMembers(roomId: string | undefined) {

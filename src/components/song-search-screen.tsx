@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Check, Plus } from "lucide-react"
+import { Search, Check, Plus, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,7 +22,7 @@ type VocalFilter = "vocal" | "inst" | "all"
 export function SongSearchScreen() {
   const { user } = useAuth()
   const { songs, loading: songsLoading } = useSongs()
-  const { repertoire, addRepertoire } = useRepertoire(user?.id)
+  const { repertoire, addRepertoire, updateRepertoire, removeRepertoire } = useRepertoire(user?.id)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [vocalFilter, setVocalFilter] = useState<VocalFilter>("all")
@@ -32,8 +32,9 @@ export function SongSearchScreen() {
   // Sheet state
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedSong, setSelectedSong] = useState<{ id: string; title: string; key: string } | null>(null)
+  const [editingEntry, setEditingEntry] = useState<{ id: string; part: string; vocal: string; preferred_keys: string[]; proficiency: string } | null>(null)
 
-  const repertoireSongIds = new Set(repertoire.map(r => r.song_id))
+  const repertoireMap = new Map(repertoire.map(r => [r.song_id, r]))
 
   const filteredSongs = songs.filter((song) => {
     const matchesSearch = song.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -48,20 +49,32 @@ export function SongSearchScreen() {
 
   const handleAddSong = (songId: string, title: string, key: string) => {
     setSelectedSong({ id: songId, title, key })
+    setEditingEntry(null)
+    setSheetOpen(true)
+  }
+
+  const handleEditSong = (songId: string, title: string, key: string, entry: typeof editingEntry) => {
+    setSelectedSong({ id: songId, title, key })
+    setEditingEntry(entry)
     setSheetOpen(true)
   }
 
   const handleRegister = async (data: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }) => {
     if (!user || !selectedSong) return
-    await addRepertoire({
-      user_id: user.id,
-      song_id: selectedSong.id,
-      part: data.part,
-      vocal: data.vocal,
-      preferred_keys: data.preferred_keys,
-      proficiency: data.proficiency,
-    })
+    if (editingEntry) {
+      await updateRepertoire(editingEntry.id, data)
+    } else {
+      await addRepertoire({
+        user_id: user.id,
+        song_id: selectedSong.id,
+        part: data.part,
+        vocal: data.vocal,
+        preferred_keys: data.preferred_keys,
+        proficiency: data.proficiency,
+      })
+    }
     setSheetOpen(false)
+    setEditingEntry(null)
   }
 
   return (
@@ -137,7 +150,8 @@ export function SongSearchScreen() {
       {/* Results List */}
       <div className="flex-1 overflow-y-auto">
         {filteredSongs.map((song, index) => {
-          const isAdded = repertoireSongIds.has(song.id)
+          const entry = repertoireMap.get(song.id)
+          const isAdded = !!entry
           return (
             <div key={song.id}>
               <div className="flex items-center justify-between px-4 py-3">
@@ -148,18 +162,55 @@ export function SongSearchScreen() {
                   <p className="mt-0.5 text-sm text-muted-foreground">
                     Key: {song.original_key || "-"} / {song.tempo || "-"} / {song.main_instrument || "-"}
                   </p>
-                </div>
-                <div className="ml-3">
-                  {isAdded ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled
-                      className="text-emerald-600 hover:text-emerald-600"
+                  {isAdded && entry && (
+                    <button
+                      type="button"
+                      className="mt-1 flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => handleEditSong(song.id, song.title, song.original_key || "", {
+                        id: entry.id,
+                        part: entry.part,
+                        vocal: entry.vocal || "none",
+                        preferred_keys: entry.preferred_keys || [],
+                        proficiency: entry.proficiency,
+                      })}
                     >
-                      <Check className="mr-1 h-4 w-4" />
-                      登録済
-                    </Button>
+                      <span className={cn(
+                        "inline-block h-2 w-2 rounded-full",
+                        entry.proficiency === "ready" ? "bg-emerald-500" :
+                        entry.proficiency === "with_practice" ? "bg-amber-500" : "bg-stone-400"
+                      )} />
+                      <span>{entry.part}</span>
+                      {entry.vocal && entry.vocal !== "none" && (
+                        <span>/ {entry.vocal === "lead" ? "Lead" : entry.vocal === "harmony_high" ? "Har(H)" : "Har(L)"}</span>
+                      )}
+                      {entry.preferred_keys && entry.preferred_keys.length > 0 && (
+                        <span>/ {entry.preferred_keys.join(", ")}</span>
+                      )}
+                    </button>
+                  )}
+                </div>
+                <div className="ml-3 flex items-center gap-1">
+                  {isAdded ? (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled
+                        className="text-emerald-600 hover:text-emerald-600"
+                      >
+                        <Check className="mr-1 h-4 w-4" />
+                        登録済
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                        onClick={() => entry && removeRepertoire(entry.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">削除</span>
+                      </Button>
+                    </>
                   ) : (
                     <Button
                       variant="outline"
@@ -189,6 +240,13 @@ export function SongSearchScreen() {
           songTitle={selectedSong.title}
           songKey={selectedSong.key}
           onRegister={handleRegister}
+          mode={editingEntry ? "edit" : "register"}
+          initialValues={editingEntry ? {
+            part: editingEntry.part,
+            vocal: editingEntry.vocal,
+            preferred_keys: editingEntry.preferred_keys,
+            proficiency: editingEntry.proficiency,
+          } : undefined}
         />
       )}
     </div>

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { PartIcon } from "@/components/icons/part-icon"
 
 interface SongRegisterSheetProps {
   open: boolean
@@ -28,13 +29,13 @@ interface SongRegisterSheetProps {
 }
 
 const instruments = [
-  { value: "guitar", label: "Guitar", icon: "🎸" },
-  { value: "banjo", label: "Banjo", icon: "🪕" },
-  { value: "mandolin", label: "Mandolin", icon: "🎸" },
-  { value: "fiddle", label: "Fiddle", icon: "🎻" },
-  { value: "bass", label: "Bass", icon: "🎸" },
-  { value: "dobro", label: "Dobro", icon: "🎸" },
-  { value: "other", label: "Other", icon: "🎵" },
+  { value: "guitar", label: "Guitar" },
+  { value: "banjo", label: "Banjo" },
+  { value: "mandolin", label: "Mandolin" },
+  { value: "fiddle", label: "Fiddle" },
+  { value: "bass", label: "Bass" },
+  { value: "dobro", label: "Dobro" },
+  { value: "other", label: "Other" },
 ]
 
 const vocalOptions = [
@@ -184,7 +185,7 @@ export function SongRegisterSheet({
                           : "border-stone-200 bg-white text-stone-400 hover:border-stone-300"
                     )}
                   >
-                    <span className="text-lg">{instrument.icon}</span>
+                    <PartIcon part={instrument.value} size="md" />
                     <span className="text-[10px] text-center leading-tight">{instrument.label}</span>
                     {isMain && <span className="text-[9px] text-amber-600 font-medium">MAIN</span>}
                   </button>

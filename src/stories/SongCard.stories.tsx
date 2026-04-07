@@ -7,9 +7,9 @@ const sampleSong: SongCardData = {
   title: "Foggy Mountain Breakdown",
   songKey: "G",
   instruments: [
-    { icon: "🎸", count: 2 },
-    { icon: "🪕", count: 1 },
-    { icon: "🎻", count: 1 },
+    { part: "guitar", count: 2 },
+    { part: "banjo", count: 1 },
+    { part: "fiddle", count: 1 },
   ],
   vocalSummary: "Lead+Har(H)",
   proficiencies: ["ready", "ready", "practice", "ready", "learning"],

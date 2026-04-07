@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { PartIcon } from "@/components/icons/part-icon"
 import { useAuth } from "@/hooks/use-auth"
 import { useProfile } from "@/hooks/use-profile"
 import { useRepertoire } from "@/hooks/use-repertoire"
@@ -21,13 +22,13 @@ import { signOut } from "@/lib/supabase/auth"
 import { createClient } from "@/lib/supabase/client"
 
 const instruments = [
-  { value: "guitar", label: "Guitar", icon: "🎸" },
-  { value: "banjo", label: "Banjo", icon: "🪕" },
-  { value: "mandolin", label: "Mandolin", icon: "🎻" },
-  { value: "fiddle", label: "Fiddle", icon: "🎻" },
-  { value: "bass", label: "Bass", icon: "🎸" },
-  { value: "dobro", label: "Dobro", icon: "🎸" },
-  { value: "other", label: "Other", icon: "🎵" },
+  { value: "guitar", label: "Guitar" },
+  { value: "banjo", label: "Banjo" },
+  { value: "mandolin", label: "Mandolin" },
+  { value: "fiddle", label: "Fiddle" },
+  { value: "bass", label: "Bass" },
+  { value: "dobro", label: "Dobro" },
+  { value: "other", label: "Other" },
 ]
 
 export function ProfileScreen() {
@@ -164,7 +165,7 @@ export function ProfileScreen() {
           <SelectTrigger className="w-full bg-stone-100 border-stone-200">
             <SelectValue>
               <span className="flex items-center gap-2">
-                <span>{currentInstrument?.icon}</span>
+                <PartIcon part={mainPart} size="sm" />
                 <span>{currentInstrument?.label}</span>
               </span>
             </SelectValue>
@@ -173,7 +174,7 @@ export function ProfileScreen() {
             {instruments.map((instrument) => (
               <SelectItem key={instrument.value} value={instrument.value}>
                 <span className="flex items-center gap-2">
-                  <span>{instrument.icon}</span>
+                  <PartIcon part={instrument.value} size="sm" />
                   <span>{instrument.label}</span>
                 </span>
               </SelectItem>

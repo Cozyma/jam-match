@@ -43,24 +43,13 @@ function useRemainingTime(expiresAt: string | undefined) {
   return remaining
 }
 
-const partIconMap: Record<string, string> = {
-  guitar: "🎸",
-  banjo: "🪕",
-  mandolin: "🎸",
-  fiddle: "🎻",
-  bass: "🎸",
-  dobro: "🎸",
-  other: "🎵",
-}
-
 function mapMatchedSongToCard(song: MatchedSong): SongCardData {
-  // Count instruments
+  // Count instruments by part name
   const instrumentCounts = new Map<string, number>()
   for (const player of song.players) {
-    const icon = partIconMap[player.part] || "🎵"
-    instrumentCounts.set(icon, (instrumentCounts.get(icon) || 0) + 1)
+    instrumentCounts.set(player.part, (instrumentCounts.get(player.part) || 0) + 1)
   }
-  const instruments = Array.from(instrumentCounts.entries()).map(([icon, count]) => ({ icon, count }))
+  const instruments = Array.from(instrumentCounts.entries()).map(([part, count]) => ({ part, count }))
 
   // Vocal summary
   const vocalLabelMap: Record<string, string> = {

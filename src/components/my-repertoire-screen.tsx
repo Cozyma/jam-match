@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Star, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { PartIcon, partConfig } from "@/components/icons/part-icon"
 import { SongRegisterSheet } from "@/components/song-register-sheet"
 import { useAuth } from "@/hooks/use-auth"
 import { useRepertoire } from "@/hooks/use-repertoire"
@@ -17,16 +18,6 @@ const partLabels: Record<string, string> = {
   bass: "Bass",
   dobro: "Dobro",
   other: "Other",
-}
-
-const partIcons: Record<string, string> = {
-  guitar: "🎸",
-  banjo: "🪕",
-  mandolin: "🎸",
-  fiddle: "🎻",
-  bass: "🎸",
-  dobro: "🎸",
-  other: "🎵",
 }
 
 const proficiencyLevels = [
@@ -140,9 +131,13 @@ export function MyRepertoireScreen() {
                 {/* Row 2: part + vocal + proficiency */}
                 <div className="mt-1 flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">
-                    {partIcons[entry.part] || "🎵"} {partLabels[entry.part] || entry.part}
+                    <PartIcon part={entry.part} size="sm" />
+                    <span>{partLabels[entry.part] || entry.part}</span>
                     {entry.sub_parts && entry.sub_parts.length > 0 && (
-                      <> + {entry.sub_parts.map(p => partIcons[p] || "🎵").join("")}</>
+                      <>
+                        <span className="text-stone-300">+</span>
+                        {entry.sub_parts.map(p => <PartIcon key={p} part={p} size="sm" />)}
+                      </>
                     )}
                     {vocalLabel && ` / ${vocalLabel}`}
                   </span>

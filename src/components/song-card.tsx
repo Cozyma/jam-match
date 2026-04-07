@@ -10,6 +10,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
+import { PartIcon } from "@/components/icons/part-icon"
 
 type Proficiency = "ready" | "practice" | "learning"
 
@@ -23,7 +24,7 @@ interface MemberDetail {
 }
 
 interface InstrumentCount {
-  icon: string
+  part: string
   count: number
 }
 
@@ -43,16 +44,6 @@ const proficiencyColors: Record<Proficiency, string> = {
   ready: "bg-emerald-500",
   practice: "bg-amber-500",
   learning: "bg-stone-400",
-}
-
-const partIconMap: Record<string, string> = {
-  guitar: "🎸",
-  banjo: "🪕",
-  mandolin: "🎸",
-  fiddle: "🎻",
-  bass: "🎸",
-  dobro: "🎸",
-  other: "🎵",
 }
 
 interface SongCardProps {
@@ -90,7 +81,7 @@ export function SongCard({ song }: SongCardProps) {
               <div className="flex items-center gap-2">
                 {song.instruments.map((inst, idx) => (
                   <span key={idx} className="flex items-center gap-0.5">
-                    <span className="text-sm">{inst.icon}</span>
+                    <PartIcon part={inst.part} size="sm" />
                     <span className="text-xs text-stone-500">x{inst.count}</span>
                   </span>
                 ))}
@@ -129,10 +120,10 @@ export function SongCard({ song }: SongCardProps) {
                     <span className="w-16 truncate font-medium text-stone-700">
                       {member.name}
                     </span>
-                    <span>{partIconMap[member.instrument] || "🎵"}</span>
+                    <PartIcon part={member.instrument} size="sm" />
                     {member.subParts.length > 0 && (
-                      <span className="text-stone-400">
-                        +{member.subParts.map(p => partIconMap[p] || "🎵").join("")}
+                      <span className="flex items-center gap-0.5 text-stone-400">
+                        +{member.subParts.map(p => <PartIcon key={p} part={p} size="sm" />)}
                       </span>
                     )}
                     <span className={cn("inline-block h-2 w-2 rounded-full", proficiencyColors[member.proficiency])} />

@@ -237,3 +237,45 @@ Theme: amber-700 primary, stone-50 background.
 
 Mobile viewport with bottom nav showing profile tab active.
 ```
+
+---
+
+## 9. 楽器アイコンセット（SVGコンポーネント）
+
+```
+Create a React component library of 7 bluegrass instrument icons as inline SVGs, styled to match the lucide-react icon system.
+
+**Design constraints:**
+- ViewBox: 24x24
+- Stroke width: 2px (same as lucide)
+- Stroke color: currentColor (inherits from parent)
+- No fill (outline only, like lucide icons)
+- Rounded line caps and joins (strokeLinecap="round", strokeLineJoin="round")
+- Each icon must be instantly distinguishable at 16x16px rendered size
+
+**7 icons needed with key differentiating silhouette features:**
+
+1. **Guitar (Acoustic)** — classic dreadnought body shape, sound hole circle, short neck
+2. **Banjo** — circular drum head (large circle), long thin neck, tuning pegs at top
+3. **Mandolin** — teardrop/pear-shaped body (smaller than guitar), short neck, paired tuning pegs (scroll headstock)
+4. **Fiddle (Violin)** — hourglass body with f-holes, chin rest hint, bow line crossing the body
+5. **Bass (Upright)** — tall body with sloped shoulders, much larger than other instruments, endpin at bottom
+6. **Dobro (Resonator)** — guitar-like body with a large circular resonator cone/plate in center (concentric circles), distinctive from regular guitar
+7. **Other** — single eighth note (♪) as generic music symbol
+
+**Export format:**
+Each icon should be a React component accepting className and size props, like:
+```tsx
+interface IconProps {
+  className?: string
+  size?: number
+}
+export function GuitarIcon({ className, size = 24 }: IconProps) {
+  return <svg>...</svg>
+}
+```
+
+**Show all 7 icons in a grid preview** at sizes 16px, 24px, and 32px so I can verify they are distinguishable at small sizes. Use a white background with stone-200 grid lines.
+
+Important: the icons must NOT look alike. Guitar vs Mandolin vs Dobro must be clearly different shapes. Banjo's circular head and Bass's tall body are the most distinctive — maintain that contrast for all 7.
+```

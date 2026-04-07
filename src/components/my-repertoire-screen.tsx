@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Trash2 } from "lucide-react"
+import { Star, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -88,6 +88,11 @@ export function MyRepertoireScreen() {
     )
   }
 
+  const sortedRepertoire = [...repertoire].sort((a, b) => {
+    if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1
+    return 0
+  })
+
   return (
     <div className="flex flex-col">
       <div className="px-4 py-2 text-sm text-muted-foreground">
@@ -95,13 +100,21 @@ export function MyRepertoireScreen() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {repertoire.map((entry, index) => {
+        {sortedRepertoire.map((entry, index) => {
           const song = songsMap.get(entry.song_id)
 
           return (
             <div key={entry.id}>
               <div className="px-4 py-3">
                 <div className="flex items-start justify-between">
+                  <button
+                    type="button"
+                    className="mr-2 mt-0.5 shrink-0 text-muted-foreground hover:text-amber-500 transition-colors"
+                    onClick={() => updateRepertoire(entry.id, { is_favorite: !entry.is_favorite })}
+                  >
+                    <Star className={cn("h-4 w-4", entry.is_favorite && "fill-amber-500 text-amber-500")} />
+                    <span className="sr-only">お気に入り</span>
+                  </button>
                   <button
                     type="button"
                     className="min-w-0 flex-1 text-left hover:opacity-80 transition-opacity"

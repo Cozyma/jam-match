@@ -77,6 +77,7 @@ rooms ──< room_members >── profiles
 | vocal | text | DEFAULT 'none', CHECK (vocal IN ('lead', 'harmony_high', 'harmony_low', 'none')) | ボーカル |
 | preferred_keys | text[] | DEFAULT '{}' | 得意キー（複数選択可） |
 | proficiency | text | NOT NULL, CHECK (proficiency IN ('ready', 'with_practice', 'learning')) | 習熟度 |
+| is_favorite | boolean | NOT NULL, DEFAULT false | お気に入り |
 | created_at | timestamptz | DEFAULT now() | 作成日時 |
 | updated_at | timestamptz | DEFAULT now() | 更新日時 |
 | | | UNIQUE (user_id, song_id) | ユーザーx曲の一意制約 |

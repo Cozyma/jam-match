@@ -89,6 +89,7 @@ function mapMatchedSongToCard(song: MatchedSong) {
     vocalSummary,
     proficiencies: proficiencies as readonly ("ready" | "practice" | "learning")[],
     coverage: `${song.player_count}/${song.member_count}人`,
+    favoriteCount: song.favorite_count,
   }
 }
 

@@ -11,6 +11,7 @@ interface MatchedSong {
   has_vocal: boolean
   player_count: number
   member_count: number
+  favorite_count: number
   players: {
     user_id: string
     display_name: string
@@ -18,6 +19,7 @@ interface MatchedSong {
     vocal: string
     proficiency: string
     preferred_keys: string[]
+    is_favorite: boolean
   }[]
 }
 
@@ -87,6 +89,7 @@ export function useMatching(roomId: string | undefined, matchLevel: MatchLevel) 
             has_vocal: song.has_vocal,
             player_count: 0,
             member_count: memberCount,
+            favorite_count: 0,
             players: [],
           })
         }
@@ -94,6 +97,7 @@ export function useMatching(roomId: string | undefined, matchLevel: MatchLevel) 
         const matched = songMap.get(song.id)!
         if (!matched.players.find(p => p.user_id === rep.user_id)) {
           matched.player_count++
+          if (rep.is_favorite) matched.favorite_count++
           matched.players.push({
             user_id: rep.user_id,
             display_name: rep.profiles?.display_name || 'Unknown',
@@ -101,6 +105,7 @@ export function useMatching(roomId: string | undefined, matchLevel: MatchLevel) 
             vocal: rep.vocal,
             proficiency: rep.proficiency,
             preferred_keys: rep.preferred_keys || [],
+            is_favorite: rep.is_favorite ?? false,
           })
         }
       }
@@ -112,6 +117,7 @@ export function useMatching(roomId: string | undefined, matchLevel: MatchLevel) 
 
       result.sort((a, b) => {
         if (b.player_count !== a.player_count) return b.player_count - a.player_count
+        if (b.favorite_count !== a.favorite_count) return b.favorite_count - a.favorite_count
         return a.title.localeCompare(b.title)
       })
 

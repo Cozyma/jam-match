@@ -169,6 +169,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          is_favorite: boolean
           part: string
           preferred_keys: string[] | null
           proficiency: string
@@ -180,6 +181,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          is_favorite?: boolean
           part: string
           preferred_keys?: string[] | null
           proficiency: string
@@ -191,6 +193,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          is_favorite?: boolean
           part?: string
           preferred_keys?: string[] | null
           proficiency?: string

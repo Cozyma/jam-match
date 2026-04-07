@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils"
 import { SongRegisterSheet } from "@/components/song-register-sheet"
 import { useAuth } from "@/hooks/use-auth"
+import { useProfile } from "@/hooks/use-profile"
 import { useSongs } from "@/hooks/use-songs"
 import { useRepertoire } from "@/hooks/use-repertoire"
 
@@ -21,6 +22,7 @@ type VocalFilter = "vocal" | "inst" | "all"
 
 export function SongSearchScreen() {
   const { user } = useAuth()
+  const { profile } = useProfile(user?.id)
   const { songs, loading: songsLoading } = useSongs()
   const { repertoire, addRepertoire } = useRepertoire(user?.id)
 
@@ -190,6 +192,7 @@ export function SongSearchScreen() {
           songTitle={selectedSong.title}
           songKey={selectedSong.key}
           hasVocal={selectedSong.hasVocal}
+          defaultPart={profile?.main_part || undefined}
           onRegister={handleRegister}
         />
       )}

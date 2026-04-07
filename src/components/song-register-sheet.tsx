@@ -21,6 +21,7 @@ interface SongRegisterSheetProps {
   songTitle: string
   songKey: string
   hasVocal?: boolean
+  defaultPart?: string
   onRegister?: (data: { part: string; sub_parts: string[]; vocal: string; preferred_keys: string[]; proficiency: string }) => void
   initialValues?: { part: string; sub_parts: string[]; vocal: string; preferred_keys: string[]; proficiency: string }
   mode?: "register" | "edit"
@@ -75,6 +76,7 @@ export function SongRegisterSheet({
   songTitle,
   songKey,
   hasVocal = true,
+  defaultPart,
   onRegister,
   initialValues,
   mode = "register",
@@ -93,7 +95,7 @@ export function SongRegisterSheet({
       setSelectedKeys(initialValues.preferred_keys)
       setSelectedProficiency(initialValues.proficiency)
     } else if (open && !initialValues) {
-      setSelectedInstrument("")
+      setSelectedInstrument(defaultPart || "")
       setSelectedSubParts([])
       setSelectedVocal("none")
       setSelectedKeys([])

@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, Clock, Share2, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { SongMiniCard } from "@/components/song-mini-card"
+import { SongCard } from "@/components/song-card"
+import type { SongCardData } from "@/components/song-card"
 import { useRoom, useRoomMembers } from "@/hooks/use-room"
 import { useMatching } from "@/hooks/use-matching"
 import type { MatchLevel, MatchedSong } from "@/hooks/use-matching"
@@ -52,7 +53,7 @@ const partIconMap: Record<string, string> = {
   other: "🎵",
 }
 
-function mapMatchedSongToCard(song: MatchedSong) {
+function mapMatchedSongToCard(song: MatchedSong): SongCardData {
   // Count instruments
   const instrumentCounts = new Map<string, number>()
   for (const player of song.players) {
@@ -62,14 +63,14 @@ function mapMatchedSongToCard(song: MatchedSong) {
   const instruments = Array.from(instrumentCounts.entries()).map(([icon, count]) => ({ icon, count }))
 
   // Vocal summary
+  const vocalLabelMap: Record<string, string> = {
+    lead: "Lead",
+    harmony_high: "Har(H)",
+    harmony_low: "Har(L)",
+  }
   const vocals = song.players
     .filter(p => p.vocal && p.vocal !== "none")
-    .map(p => {
-      if (p.vocal === "lead") return "Lead"
-      if (p.vocal === "harmony_high") return "Har(H)"
-      if (p.vocal === "harmony_low") return "Har(L)"
-      return ""
-    })
+    .map(p => vocalLabelMap[p.vocal] || "")
     .filter(Boolean)
   const vocalSummary = vocals.length > 0 ? vocals.join("+") : "Inst"
 
@@ -81,6 +82,16 @@ function mapMatchedSongToCard(song: MatchedSong) {
   }
   const proficiencies = song.players.map(p => profMap[p.proficiency] || "learning")
 
+  // Members
+  const members = song.players.map(p => ({
+    name: p.display_name,
+    instrument: p.part,
+    subParts: p.sub_parts,
+    proficiency: profMap[p.proficiency] || "learning" as const,
+    vocalRole: p.vocal && p.vocal !== "none" ? (vocalLabelMap[p.vocal] || null) : null,
+    preferredKeys: p.preferred_keys,
+  }))
+
   return {
     id: song.id,
     title: song.title,
@@ -90,6 +101,7 @@ function mapMatchedSongToCard(song: MatchedSong) {
     proficiencies: proficiencies as readonly ("ready" | "practice" | "learning")[],
     coverage: `${song.player_count}/${song.member_count}人`,
     favoriteCount: song.favorite_count,
+    members,
   }
 }
 
@@ -181,7 +193,7 @@ export function JamRoomScreen({ roomId, roomCode, expiresAt }: JamRoomScreenProp
         {/* Song List */}
         <div className="flex flex-col gap-3">
           {matchedSongs.map((song) => (
-            <SongMiniCard key={song.id} song={mapMatchedSongToCard(song)} />
+            <SongCard key={song.id} song={mapMatchedSongToCard(song)} />
           ))}
         </div>
       </main>

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs"
 import { SongCard } from "@/components/song-card"
+import type { SongCardData } from "@/components/song-card"
 
-const sampleSong = {
+const sampleSong: SongCardData = {
+  id: "1",
   title: "Foggy Mountain Breakdown",
   songKey: "G",
   instruments: [
@@ -9,44 +11,50 @@ const sampleSong = {
     { icon: "🪕", count: 1 },
     { icon: "🎻", count: 1 },
   ],
-  vocalSummary: "Lead+Har",
-  proficiencies: ["ready", "ready", "practice", "ready", "learning"] as const,
+  vocalSummary: "Lead+Har(H)",
+  proficiencies: ["ready", "ready", "practice", "ready", "learning"],
   coverage: "5/5人",
+  favoriteCount: 3,
   members: [
     {
       name: "田中",
       instrument: "guitar",
-      proficiency: "ready" as const,
+      subParts: ["mandolin"],
+      proficiency: "ready",
       vocalRole: "Lead",
       preferredKeys: ["G", "A"],
     },
     {
       name: "鈴木",
       instrument: "banjo",
-      proficiency: "ready" as const,
-      vocalRole: "Harmony (High)",
+      subParts: [],
+      proficiency: "ready",
+      vocalRole: "Har(H)",
       preferredKeys: ["G"],
     },
     {
       name: "佐藤",
       instrument: "fiddle",
-      proficiency: "practice" as const,
+      subParts: [],
+      proficiency: "practice",
       vocalRole: null,
-      preferredKeys: ["G", "D"],
+      preferredKeys: [],
     },
     {
       name: "高橋",
       instrument: "guitar",
-      proficiency: "ready" as const,
-      vocalRole: "Harmony (Low)",
+      subParts: ["bass"],
+      proficiency: "ready",
+      vocalRole: "Har(L)",
       preferredKeys: ["G", "A", "D"],
     },
     {
       name: "伊藤",
       instrument: "bass",
-      proficiency: "learning" as const,
+      subParts: [],
+      proficiency: "learning",
       vocalRole: null,
-      preferredKeys: ["G"],
+      preferredKeys: [],
     },
   ],
 }
@@ -61,15 +69,8 @@ const meta: Meta<typeof SongCard> = {
 export default meta
 type Story = StoryObj<typeof SongCard>
 
-export const Collapsed: Story = {
+export const Default: Story = {
   args: {
     song: sampleSong,
-  },
-}
-
-export const Expanded: Story = {
-  args: {
-    song: sampleSong,
-    defaultOpen: true,
   },
 }

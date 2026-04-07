@@ -75,30 +75,15 @@ export function MyRepertoireScreen() {
     setEditingEntry(null)
   }
 
-  if (loading) {
-    return <div className="px-4 py-8 text-center text-sm text-muted-foreground">読み込み中...</div>
-  }
-
-  if (repertoire.length === 0) {
-    return (
-      <div className="px-4 py-12 text-center">
-        <p className="text-muted-foreground">まだレパートリーが登録されていません</p>
-        <p className="mt-1 text-sm text-muted-foreground">「曲を探す」タブから曲を追加しましょう</p>
-      </div>
-    )
-  }
-
   const profOrder: Record<string, number> = { ready: 0, with_practice: 1, learning: 2 }
 
   const filteredAndSorted = useMemo(() => {
     let list = [...repertoire]
 
-    // Filters
     if (profFilter) list = list.filter(e => e.proficiency === profFilter)
     if (partFilter) list = list.filter(e => e.part === partFilter)
     if (favOnly) list = list.filter(e => e.is_favorite)
 
-    // Sort
     list.sort((a, b) => {
       switch (sortBy) {
         case "favorite":
@@ -121,11 +106,23 @@ export function MyRepertoireScreen() {
     return list
   }, [repertoire, profFilter, partFilter, favOnly, sortBy, songsMap])
 
-  // パート選択肢（実際に使われているパートのみ）
   const usedParts = useMemo(() => {
     const parts = new Set(repertoire.map(e => e.part))
     return Array.from(parts).sort()
   }, [repertoire])
+
+  if (loading) {
+    return <div className="px-4 py-8 text-center text-sm text-muted-foreground">読み込み中...</div>
+  }
+
+  if (repertoire.length === 0) {
+    return (
+      <div className="px-4 py-12 text-center">
+        <p className="text-muted-foreground">まだレパートリーが登録されていません</p>
+        <p className="mt-1 text-sm text-muted-foreground">「曲を探す」タブから曲を追加しましょう</p>
+      </div>
+    )
+  }
 
   const sortOptions = [
     { value: "favorite", label: "★" },

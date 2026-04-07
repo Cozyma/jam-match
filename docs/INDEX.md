@@ -23,6 +23,7 @@ tags: [Index, ドキュメント]
 | `docs/design/decisions/` | **設計判断**<br>ADR（Architecture Decision Records）。 | #設計 #ADR |
 | `docs/design/basic/screen-design/` | **設計（基本）**<br>画面設計書。 | #設計 |
 | `docs/design/functional-specs/` | **設計（機能）**<br>機能設計書（仕様・計画・ガイド）を格納。 | #設計 |
+| `docs/design/functional-specs/use-cases.md` | **ドメイン操作ユースケース一覧**<br>ルーム・レパートリーの操作系・表示系ユースケースと実装状況。 | #設計 #ユースケース |
 | `docs/design/detailed/` | **設計（詳細）**<br>処理フロー・実装詳細。 | #設計 #実装 |
 | `docs/database/` | **データベース**<br>Supabase スキーマドキュメント。 | #データベース |
 | `docs/operations-guide/` | **運用ガイド**<br>運用手順、テストデータ作成手順など。 | #運用 |

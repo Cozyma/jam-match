@@ -30,11 +30,11 @@ const partIcons: Record<string, string> = {
   other: "🎵",
 }
 
-const proficiencyConfig = {
-  ready: { label: "いつでもOK", dot: "bg-emerald-500" },
-  with_practice: { label: "練習すればOK", dot: "bg-amber-500" },
-  learning: { label: "挑戦中", dot: "bg-stone-400" },
-} as const
+const proficiencyLevels = [
+  { value: "ready", label: "◎", dot: "bg-emerald-500", activeBg: "bg-emerald-50 border-emerald-500 text-emerald-700" },
+  { value: "with_practice", label: "○", dot: "bg-amber-500", activeBg: "bg-amber-50 border-amber-500 text-amber-700" },
+  { value: "learning", label: "△", dot: "bg-stone-400", activeBg: "bg-stone-100 border-stone-400 text-stone-600" },
+] as const
 
 export function MyRepertoireScreen() {
   const { user } = useAuth()
@@ -97,17 +97,16 @@ export function MyRepertoireScreen() {
       <div className="flex-1 overflow-y-auto">
         {repertoire.map((entry, index) => {
           const song = songsMap.get(entry.song_id)
-          const prof = proficiencyConfig[entry.proficiency as keyof typeof proficiencyConfig]
 
           return (
             <div key={entry.id}>
-              <button
-                type="button"
-                className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors"
-                onClick={() => handleEdit(entry)}
-              >
+              <div className="px-4 py-3">
                 <div className="flex items-start justify-between">
-                  <div className="min-w-0 flex-1">
+                  <button
+                    type="button"
+                    className="min-w-0 flex-1 text-left hover:opacity-80 transition-opacity"
+                    onClick={() => handleEdit(entry)}
+                  >
                     <h3 className="truncate font-medium text-foreground">
                       {song?.title || "不明な曲"}
                     </h3>
@@ -124,33 +123,46 @@ export function MyRepertoireScreen() {
                           {entry.vocal === "lead" ? "Lead" : entry.vocal === "harmony_high" ? "Har(H)" : "Har(L)"}
                         </Badge>
                       )}
-                      {prof && (
-                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                          <span className={cn("inline-block h-2 w-2 rounded-full", prof.dot)} />
-                          {prof.label}
-                        </span>
-                      )}
                       {entry.preferred_keys && entry.preferred_keys.length > 0 && (
                         <span className="text-xs text-muted-foreground">
                           Key: {entry.preferred_keys.join(", ")}
                         </span>
                       )}
                     </div>
-                  </div>
+                  </button>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="ml-2 h-8 w-8 shrink-0 text-muted-foreground hover:text-red-600"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      removeRepertoire(entry.id)
-                    }}
+                    onClick={() => removeRepertoire(entry.id)}
                   >
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">削除</span>
                   </Button>
                 </div>
-              </button>
+                {/* Inline proficiency switcher */}
+                <div className="mt-2 flex gap-1">
+                  {proficiencyLevels.map((level) => (
+                    <button
+                      key={level.value}
+                      type="button"
+                      className={cn(
+                        "flex-1 rounded-md border py-1.5 text-xs font-medium transition-all",
+                        entry.proficiency === level.value
+                          ? level.activeBg
+                          : "border-transparent text-muted-foreground hover:bg-muted"
+                      )}
+                      onClick={() => {
+                        if (entry.proficiency !== level.value) {
+                          updateRepertoire(entry.id, { proficiency: level.value })
+                        }
+                      }}
+                    >
+                      {level.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {index < repertoire.length - 1 && (
                 <div className="mx-4 border-b border-border" />
               )}

@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Star, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { SongRegisterSheet } from "@/components/song-register-sheet"
 import { useAuth } from "@/hooks/use-auth"
@@ -103,80 +102,67 @@ export function MyRepertoireScreen() {
         {sortedRepertoire.map((entry, index) => {
           const song = songsMap.get(entry.song_id)
 
+          const vocalLabel = entry.vocal === "lead" ? "Lead" : entry.vocal === "harmony_high" ? "Har(H)" : entry.vocal === "harmony_low" ? "Har(L)" : null
+
           return (
             <div key={entry.id}>
-              <div className="px-4 py-3">
-                <div className="flex items-start justify-between">
+              <div className="px-4 py-2.5">
+                {/* Row 1: star + title + key + delete */}
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    className="mr-2 mt-0.5 shrink-0 text-muted-foreground hover:text-amber-500 transition-colors"
+                    className="shrink-0 text-muted-foreground hover:text-amber-500 transition-colors"
                     onClick={() => updateRepertoire(entry.id, { is_favorite: !entry.is_favorite })}
                   >
-                    <Star className={cn("h-4 w-4", entry.is_favorite && "fill-amber-500 text-amber-500")} />
-                    <span className="sr-only">お気に入り</span>
+                    <Star className={cn("h-3.5 w-3.5", entry.is_favorite && "fill-amber-500 text-amber-500")} />
                   </button>
                   <button
                     type="button"
-                    className="min-w-0 flex-1 text-left hover:opacity-80 transition-opacity"
+                    className="min-w-0 flex-1 text-left truncate font-medium text-sm text-foreground hover:opacity-80 transition-opacity"
                     onClick={() => handleEdit(entry)}
                   >
-                    <h3 className="truncate font-medium text-foreground">
-                      {song?.title || "不明な曲"}
-                    </h3>
-                    <p className="mt-0.5 text-sm text-muted-foreground">
-                      Key: {song?.original_key || "-"} / {song?.tempo || "-"}
-                    </p>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                      <Badge variant="secondary" className="text-xs gap-1">
-                        <span>{partIcons[entry.part] || "🎵"}</span>
-                        {partLabels[entry.part] || entry.part}
-                      </Badge>
-                      {entry.vocal && entry.vocal !== "none" && (
-                        <Badge variant="secondary" className="text-xs">
-                          {entry.vocal === "lead" ? "Lead" : entry.vocal === "harmony_high" ? "Har(H)" : "Har(L)"}
-                        </Badge>
-                      )}
-                      {entry.preferred_keys && entry.preferred_keys.length > 0 && (
-                        <span className="text-xs text-muted-foreground">
-                          Key: {entry.preferred_keys.join(", ")}
-                        </span>
-                      )}
-                    </div>
+                    {song?.title || "不明な曲"}
                   </button>
+                  <span className="shrink-0 text-xs text-muted-foreground">{song?.original_key || "-"}</span>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="ml-2 h-8 w-8 shrink-0 text-muted-foreground hover:text-red-600"
+                    className="h-6 w-6 shrink-0 text-muted-foreground hover:text-red-600"
                     onClick={() => removeRepertoire(entry.id)}
                   >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">削除</span>
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
-                {/* Inline proficiency switcher */}
-                <div className="mt-2 flex gap-1">
-                  {proficiencyLevels.map((level) => (
-                    <button
-                      key={level.value}
-                      type="button"
-                      className={cn(
-                        "flex-1 rounded-md border py-1.5 text-xs font-medium transition-all",
-                        entry.proficiency === level.value
-                          ? level.activeBg
-                          : "border-transparent text-muted-foreground hover:bg-muted"
-                      )}
-                      onClick={() => {
-                        if (entry.proficiency !== level.value) {
-                          updateRepertoire(entry.id, { proficiency: level.value })
-                        }
-                      }}
-                    >
-                      {level.label}
-                    </button>
-                  ))}
+                {/* Row 2: part + vocal + proficiency */}
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {partIcons[entry.part] || "🎵"} {partLabels[entry.part] || entry.part}
+                    {vocalLabel && ` / ${vocalLabel}`}
+                  </span>
+                  <div className="ml-auto flex gap-0.5">
+                    {proficiencyLevels.map((level) => (
+                      <button
+                        key={level.value}
+                        type="button"
+                        className={cn(
+                          "rounded px-2.5 py-0.5 text-xs font-medium transition-all",
+                          entry.proficiency === level.value
+                            ? level.activeBg
+                            : "text-muted-foreground/50 hover:text-muted-foreground"
+                        )}
+                        onClick={() => {
+                          if (entry.proficiency !== level.value) {
+                            updateRepertoire(entry.id, { proficiency: level.value })
+                          }
+                        }}
+                      >
+                        {level.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-              {index < repertoire.length - 1 && (
+              {index < sortedRepertoire.length - 1 && (
                 <div className="mx-4 border-b border-border" />
               )}
             </div>

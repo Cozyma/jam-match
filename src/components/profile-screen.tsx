@@ -39,6 +39,8 @@ export function ProfileScreen() {
 
   const [isEditingName, setIsEditingName] = useState(false)
   const [tempName, setTempName] = useState("")
+  const [area, setArea] = useState("")
+  const [bandName, setBandName] = useState("")
 
   const supabase = createClient()
 
@@ -55,12 +57,14 @@ export function ProfileScreen() {
     fetchRoomCount()
   }, [user?.id])
 
-  // Sync tempName with profile
+  // Sync local state with profile
   useEffect(() => {
-    if (profile?.display_name) {
-      setTempName(profile.display_name)
+    if (profile) {
+      setTempName(profile.display_name || "")
+      setArea(profile.area || "")
+      setBandName(profile.band_name || "")
     }
-  }, [profile?.display_name])
+  }, [profile])
 
   const displayName = profile?.display_name || ""
   const mainPart = profile?.main_part || "guitar"
@@ -176,6 +180,34 @@ export function ProfileScreen() {
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      {/* Area */}
+      <div className="mt-4">
+        <label className="mb-2 block text-sm font-medium text-foreground">
+          活動エリア
+        </label>
+        <Input
+          value={area}
+          onChange={(e) => setArea(e.target.value)}
+          onBlur={() => updateProfile({ area: area || null })}
+          placeholder="例: 東京、名古屋"
+          className="bg-stone-100 border-stone-200"
+        />
+      </div>
+
+      {/* Band Name */}
+      <div className="mt-4">
+        <label className="mb-2 block text-sm font-medium text-foreground">
+          バンド名
+        </label>
+        <Input
+          value={bandName}
+          onChange={(e) => setBandName(e.target.value)}
+          onBlur={() => updateProfile({ band_name: bandName || null })}
+          placeholder="例: Mountain Pickers"
+          className="bg-stone-100 border-stone-200"
+        />
       </div>
 
       {/* Stats Section */}

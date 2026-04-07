@@ -46,6 +46,8 @@ rooms ──< room_members >── profiles
 | id | uuid | PRIMARY KEY, REFERENCES auth.users(id) ON DELETE CASCADE | ユーザーID（auth.uidと同一） |
 | display_name | text | NOT NULL | 表示名 |
 | main_part | text | | メイン担当パート |
+| area | text | | 活動エリア |
+| band_name | text | | バンド名 |
 | avatar_url | text | | アバター画像URL |
 | created_at | timestamptz | DEFAULT now() | 作成日時 |
 | updated_at | timestamptz | DEFAULT now() | 更新日時 |

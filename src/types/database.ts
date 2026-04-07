@@ -36,7 +36,9 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          area: string | null
           avatar_url: string | null
+          band_name: string | null
           created_at: string | null
           display_name: string
           id: string
@@ -44,7 +46,9 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          area?: string | null
           avatar_url?: string | null
+          band_name?: string | null
           created_at?: string | null
           display_name: string
           id: string
@@ -52,7 +56,9 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          area?: string | null
           avatar_url?: string | null
+          band_name?: string | null
           created_at?: string | null
           display_name?: string
           id?: string

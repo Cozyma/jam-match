@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Bluegrass GONG - Bluegrass Jam Sessions",
   description: "Find musicians and jam together",
+  manifest: "/manifest.json",
+  themeColor: "#b45309",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Bluegrass GONG",
+  },
 };
 
 export default function RootLayout({
@@ -24,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="ja"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

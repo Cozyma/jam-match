@@ -45,6 +45,7 @@ export function MyRepertoireScreen() {
     id: string
     songTitle: string
     songKey: string
+    hasVocal: boolean
     part: string
     vocal: string
     preferred_keys: string[]
@@ -59,6 +60,7 @@ export function MyRepertoireScreen() {
       id: entry.id,
       songTitle: song?.title || "",
       songKey: song?.original_key || "",
+      hasVocal: song?.has_vocal !== false,
       part: entry.part,
       vocal: entry.vocal || "none",
       preferred_keys: entry.preferred_keys || [],
@@ -176,6 +178,7 @@ export function MyRepertoireScreen() {
           onOpenChange={setSheetOpen}
           songTitle={editingEntry.songTitle}
           songKey={editingEntry.songKey}
+          hasVocal={editingEntry.hasVocal}
           onRegister={handleUpdate}
           mode="edit"
           initialValues={{

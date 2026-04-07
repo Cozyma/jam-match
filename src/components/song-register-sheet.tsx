@@ -20,6 +20,7 @@ interface SongRegisterSheetProps {
   onOpenChange: (open: boolean) => void
   songTitle: string
   songKey: string
+  hasVocal?: boolean
   onRegister?: (data: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }) => void
   initialValues?: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }
   mode?: "register" | "edit"
@@ -73,6 +74,7 @@ export function SongRegisterSheet({
   onOpenChange,
   songTitle,
   songKey,
+  hasVocal = true,
   onRegister,
   initialValues,
   mode = "register",
@@ -100,8 +102,8 @@ export function SongRegisterSheet({
     if (onRegister) {
       onRegister({
         part: selectedInstrument,
-        vocal: selectedVocal,
-        preferred_keys: selectedKeys,
+        vocal: hasVocal ? selectedVocal : "none",
+        preferred_keys: hasVocal ? selectedKeys : [],
         proficiency: selectedProficiency,
       })
     }
@@ -166,8 +168,8 @@ export function SongRegisterSheet({
             </RadioGroup>
           </div>
 
-          {/* Vocal Selection */}
-          <div className="space-y-3">
+          {/* Vocal Selection (歌あり曲のみ) */}
+          {hasVocal && <div className="space-y-3">
             <Label className="text-sm font-medium text-foreground">ボーカル</Label>
             <RadioGroup
               value={selectedVocal}
@@ -192,10 +194,10 @@ export function SongRegisterSheet({
                 </Label>
               ))}
             </RadioGroup>
-          </div>
+          </div>}
 
-          {/* Preferred Keys - plain buttons instead of ToggleGroup */}
-          <div className="space-y-3">
+          {/* Preferred Keys (歌あり曲のみ) */}
+          {hasVocal && <div className="space-y-3">
             <Label className="text-sm font-medium text-foreground">得意キー</Label>
             <div className="flex flex-wrap gap-2">
               {keys.map((key) => (
@@ -214,7 +216,7 @@ export function SongRegisterSheet({
                 </button>
               ))}
             </div>
-          </div>
+          </div>}
 
           {/* Proficiency Selection */}
           <div className="space-y-3">

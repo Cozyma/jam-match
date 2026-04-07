@@ -31,7 +31,7 @@ export function SongSearchScreen() {
 
   // Sheet state
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [selectedSong, setSelectedSong] = useState<{ id: string; title: string; key: string } | null>(null)
+  const [selectedSong, setSelectedSong] = useState<{ id: string; title: string; key: string; hasVocal: boolean } | null>(null)
 
   const repertoireSongIds = new Set(repertoire.map(r => r.song_id))
 
@@ -46,8 +46,8 @@ export function SongSearchScreen() {
     return matchesSearch && matchesKey && matchesTempo && matchesVocal
   })
 
-  const handleAddSong = (songId: string, title: string, key: string) => {
-    setSelectedSong({ id: songId, title, key })
+  const handleAddSong = (songId: string, title: string, key: string, hasVocal: boolean) => {
+    setSelectedSong({ id: songId, title, key, hasVocal })
     setSheetOpen(true)
   }
 
@@ -164,7 +164,7 @@ export function SongSearchScreen() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleAddSong(song.id, song.title, song.original_key || "")}
+                      onClick={() => handleAddSong(song.id, song.title, song.original_key || "", song.has_vocal !== false)}
                       className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     >
                       <Plus className="mr-1 h-4 w-4" />
@@ -188,6 +188,7 @@ export function SongSearchScreen() {
           onOpenChange={setSheetOpen}
           songTitle={selectedSong.title}
           songKey={selectedSong.key}
+          hasVocal={selectedSong.hasVocal}
           onRegister={handleRegister}
         />
       )}

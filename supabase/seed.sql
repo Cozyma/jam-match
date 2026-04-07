@@ -61,7 +61,8 @@ ON CONFLICT (title) DO NOTHING;
 INSERT INTO auth.users (
   id, instance_id, aud, role, email, encrypted_password,
   email_confirmed_at, created_at, updated_at,
-  raw_app_meta_data, raw_user_meta_data, is_super_admin
+  raw_app_meta_data, raw_user_meta_data, is_super_admin,
+  confirmation_token, recovery_token, email_change_token_new, email_change_token_current
 ) VALUES
   (
     'a1111111-1111-1111-1111-111111111111',
@@ -72,7 +73,7 @@ INSERT INTO auth.users (
     now(), now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"テストユーザー"}',
-    false
+    false, '', '', '', ''
   ),
   (
     'a2222222-2222-2222-2222-222222222222',
@@ -83,7 +84,7 @@ INSERT INTO auth.users (
     now(), now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"田中太郎"}',
-    false
+    false, '', '', '', ''
   ),
   (
     'a3333333-3333-3333-3333-333333333333',
@@ -94,7 +95,7 @@ INSERT INTO auth.users (
     now(), now(), now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"鈴木花子"}',
-    false
+    false, '', '', '', ''
   )
 ON CONFLICT (id) DO NOTHING;
 

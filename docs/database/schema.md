@@ -15,6 +15,7 @@ tags: [データベース, Supabase, スキーマ]
 | user_repertoires | レパートリー（ユーザー x 曲） |
 | rooms | ジャムセッションルーム |
 | room_members | ルーム参加者 |
+| room_played_songs | ルーム内演奏済み曲 |
 
 ## ER図
 
@@ -24,15 +25,18 @@ auth.users
     | 1:1 (CASCADE)
     v
 profiles ──< user_repertoires >── songs
-    |
-    | 1:N (CASCADE)
-    v
-rooms ──< room_members >── profiles
+    |                                |
+    | 1:N (CASCADE)                  |
+    v                                |
+rooms ──< room_members >── profiles  |
+    |                                |
+    └──< room_played_songs >─────────┘
 ```
 
 - `profiles.id` は `auth.users.id` を参照（1:1）
 - `user_repertoires` は `profiles` と `songs` の中間テーブル（UNIQUE: user_id + song_id）
 - `room_members` は `rooms` と `profiles` の中間テーブル（UNIQUE: room_id + user_id）
+- `room_played_songs` は `rooms` と `songs` の中間テーブル（UNIQUE: room_id + song_id）
 - 全ての外部キーに ON DELETE CASCADE を設定
 
 ## テーブル定義
@@ -111,6 +115,19 @@ rooms ──< room_members >── profiles
 | joined_at | timestamptz | DEFAULT now() | 参加日時 |
 | | | UNIQUE (room_id, user_id) | ルームxユーザーの一意制約 |
 
+### room_played_songs
+
+ルーム内で演奏済みの曲を記録。Realtimeで全メンバーに同期される。
+
+| カラム | 型 | 制約 | 説明 |
+|--------|------|------|------|
+| id | uuid | PRIMARY KEY, DEFAULT gen_random_uuid() | レコードID |
+| room_id | uuid | NOT NULL, REFERENCES rooms(id) ON DELETE CASCADE | ルームID |
+| song_id | uuid | NOT NULL, REFERENCES songs(id) ON DELETE CASCADE | 曲ID |
+| marked_by | uuid | NOT NULL, REFERENCES profiles(id) ON DELETE CASCADE | マークしたユーザーID |
+| played_at | timestamptz | DEFAULT now() | 演奏日時 |
+| | | UNIQUE (room_id, song_id) | ルームx曲の一意制約 |
+
 ## RLSポリシー一覧
 
 全テーブルでRow Level Security (RLS) を有効化。
@@ -130,6 +147,9 @@ rooms ──< room_members >── profiles
 | room_members | members_select | SELECT | 全員閲覧可（`true`） |
 | room_members | members_insert | INSERT | 自分のレコードのみ（`auth.uid() = user_id`） |
 | room_members | members_delete | DELETE | 自分のレコードのみ（`auth.uid() = user_id`） |
+| room_played_songs | played_select | SELECT | 全員閲覧可（`true`） |
+| room_played_songs | played_insert | INSERT | 自分がマーク（`auth.uid() = marked_by`） |
+| room_played_songs | played_delete | DELETE | 自分がマークしたもの（`auth.uid() = marked_by`） |
 
 ## インデックス一覧
 
@@ -139,17 +159,29 @@ rooms ──< room_members >── profiles
 | idx_user_repertoires_song | user_repertoires | song_id | 曲別レパートリー検索 |
 | idx_room_members_room | room_members | room_id | ルーム別メンバー一覧取得 |
 | idx_rooms_code | rooms | code | 参加コードによるルーム検索 |
+| idx_user_repertoires_favorite | user_repertoires | user_id, is_favorite DESC | お気に入り順ソート |
+| idx_room_played_songs_room | room_played_songs | room_id | ルーム別演奏済み曲取得 |
 
 ## Realtime設定
 
-`room_members` テーブルのみRealtimeを有効化。
+`room_members` と `room_played_songs` テーブルでRealtimeを有効化。
 
 ```sql
 ALTER PUBLICATION supabase_realtime ADD TABLE room_members;
+ALTER PUBLICATION supabase_realtime ADD TABLE room_played_songs;
 ```
 
-ルームへのメンバー入退室（INSERT/DELETE）をリアルタイムで検知し、マッチング結果を再計算するために使用。
+- `room_members`: メンバー入退室をリアルタイム検知し、マッチング結果を再計算
+- `room_played_songs`: 演奏済みマークを全メンバーにリアルタイム同期
 
 ## 初期データ
 
-`supabase/seed.sql` にてブルーグラススタンダード50曲を投入済み。`supabase db reset` で適用される。
+`supabase/seed.sql` にてブルーグラススタンダード50曲とテストユーザー3名（レパートリー付き）を投入。`supabase db reset` で適用される。
+
+| ユーザー | メール | パート | レパートリー |
+|---------|--------|--------|------------|
+| テストユーザー | test.user@gmail.com | Guitar | 8曲 |
+| 田中太郎 | tanaka@example.com | Banjo | 6曲 |
+| 鈴木花子 | suzuki@example.com | Fiddle | 6曲 |
+
+パスワードは全員 `testpass`。

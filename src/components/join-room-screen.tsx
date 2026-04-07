@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
-import { Camera, ArrowLeft } from "lucide-react"
+import { Camera, ArrowLeft, X } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { useRoom } from "@/hooks/use-room"
+import { Html5Qrcode } from "html5-qrcode"
 
 export function JoinRoomScreen() {
   const router = useRouter()
@@ -15,7 +16,51 @@ export function JoinRoomScreen() {
   const [code, setCode] = useState("")
   const [joining, setJoining] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [scanning, setScanning] = useState(false)
+  const scannerRef = useRef<Html5Qrcode | null>(null)
   const isComplete = code.length === 6
+
+  const startScanner = async () => {
+    setScanning(true)
+    setError(null)
+    try {
+      const scanner = new Html5Qrcode("qr-reader")
+      scannerRef.current = scanner
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 200, height: 200 } },
+        (decodedText) => {
+          // QRコードから6文字の英数字を抽出
+          const match = decodedText.match(/[A-Z2-9]{6}/i)
+          if (match) {
+            setCode(match[0].toUpperCase())
+          } else {
+            setCode(decodedText.slice(0, 6).toUpperCase())
+          }
+          stopScanner()
+        },
+        () => {},
+      )
+    } catch {
+      setError("カメラを起動できませんでした")
+      setScanning(false)
+    }
+  }
+
+  const stopScanner = async () => {
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop()
+        scannerRef.current.clear()
+      } catch {}
+      scannerRef.current = null
+    }
+    setScanning(false)
+  }
+
+  useEffect(() => {
+    return () => { stopScanner() }
+  }, [])
 
   const handleJoin = async () => {
     if (!isComplete || !user) return
@@ -112,14 +157,31 @@ export function JoinRoomScreen() {
             <div className="flex-1 h-px bg-stone-200" />
           </div>
 
-          {/* QR Scan Button */}
-          <Button
-            variant="outline"
-            className="w-full max-w-sm h-12 border-stone-300 text-stone-700 hover:bg-stone-50 gap-2"
-          >
-            <Camera className="h-5 w-5" />
-            QRコードをスキャン
-          </Button>
+          {/* QR Scanner */}
+          {scanning ? (
+            <div className="w-full max-w-sm">
+              <div className="relative rounded-lg overflow-hidden border border-stone-200">
+                <div id="qr-reader" className="w-full" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-2 right-2 z-10 bg-white/80 hover:bg-white h-8 w-8"
+                  onClick={stopScanner}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              className="w-full max-w-sm h-12 border-stone-300 text-stone-700 hover:bg-stone-50 gap-2"
+              onClick={startScanner}
+            >
+              <Camera className="h-5 w-5" />
+              QRコードをスキャン
+            </Button>
+          )}
         </div>
 
         {/* Join Button */}

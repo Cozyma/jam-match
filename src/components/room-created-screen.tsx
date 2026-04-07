@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Copy, Check } from "lucide-react"
+import { QRCodeSVG } from "qrcode.react"
 
 interface RoomCreatedScreenProps {
   roomCode?: string
@@ -70,41 +71,15 @@ export function RoomCreatedScreen({
         </div>
       </Card>
 
-      {/* QR Code Placeholder */}
-      <Card className="w-48 h-48 bg-white border-stone-200 mb-6 p-4">
-        <div className="w-full h-full bg-stone-100 rounded flex items-center justify-center relative overflow-hidden">
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <rect x="5" y="5" width="25" height="25" fill="#292524" rx="2" />
-            <rect x="10" y="10" width="15" height="15" fill="#fafaf9" rx="1" />
-            <rect x="13" y="13" width="9" height="9" fill="#292524" rx="1" />
-            <rect x="70" y="5" width="25" height="25" fill="#292524" rx="2" />
-            <rect x="75" y="10" width="15" height="15" fill="#fafaf9" rx="1" />
-            <rect x="78" y="13" width="9" height="9" fill="#292524" rx="1" />
-            <rect x="5" y="70" width="25" height="25" fill="#292524" rx="2" />
-            <rect x="10" y="75" width="15" height="15" fill="#fafaf9" rx="1" />
-            <rect x="13" y="78" width="9" height="9" fill="#292524" rx="1" />
-            <rect x="35" y="5" width="5" height="5" fill="#292524" />
-            <rect x="45" y="5" width="5" height="5" fill="#292524" />
-            <rect x="55" y="5" width="5" height="5" fill="#292524" />
-            <rect x="35" y="15" width="5" height="5" fill="#292524" />
-            <rect x="50" y="15" width="5" height="5" fill="#292524" />
-            <rect x="60" y="15" width="5" height="5" fill="#292524" />
-            <rect x="40" y="25" width="5" height="5" fill="#292524" />
-            <rect x="55" y="25" width="5" height="5" fill="#292524" />
-            <rect x="5" y="35" width="5" height="5" fill="#292524" />
-            <rect x="15" y="35" width="5" height="5" fill="#292524" />
-            <rect x="35" y="35" width="5" height="5" fill="#292524" />
-            <rect x="55" y="35" width="5" height="5" fill="#292524" />
-            <rect x="75" y="35" width="5" height="5" fill="#292524" />
-            <rect x="45" y="50" width="5" height="5" fill="#292524" />
-            <rect x="70" y="50" width="5" height="5" fill="#292524" />
-            <rect x="35" y="70" width="5" height="5" fill="#292524" />
-            <rect x="55" y="70" width="5" height="5" fill="#292524" />
-            <rect x="75" y="70" width="5" height="5" fill="#292524" />
-            <rect x="50" y="90" width="5" height="5" fill="#292524" />
-            <rect x="80" y="90" width="5" height="5" fill="#292524" />
-          </svg>
-        </div>
+      {/* QR Code */}
+      <Card className="bg-white border-stone-200 mb-6 p-4">
+        <QRCodeSVG
+          value={roomCode}
+          size={160}
+          level="M"
+          bgColor="#ffffff"
+          fgColor="#292524"
+        />
       </Card>
 
       {/* Instruction Text */}

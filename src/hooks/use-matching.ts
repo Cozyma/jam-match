@@ -16,6 +16,7 @@ interface MatchedSong {
     user_id: string
     display_name: string
     part: string
+    sub_parts: string[]
     vocal: string
     proficiency: string
     preferred_keys: string[]
@@ -102,6 +103,7 @@ export function useMatching(roomId: string | undefined, matchLevel: MatchLevel) 
             user_id: rep.user_id,
             display_name: rep.profiles?.display_name || 'Unknown',
             part: rep.part,
+            sub_parts: rep.sub_parts || [],
             vocal: rep.vocal,
             proficiency: rep.proficiency,
             preferred_keys: rep.preferred_keys || [],

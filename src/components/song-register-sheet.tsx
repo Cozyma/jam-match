@@ -21,8 +21,8 @@ interface SongRegisterSheetProps {
   songTitle: string
   songKey: string
   hasVocal?: boolean
-  onRegister?: (data: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }) => void
-  initialValues?: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }
+  onRegister?: (data: { part: string; sub_parts: string[]; vocal: string; preferred_keys: string[]; proficiency: string }) => void
+  initialValues?: { part: string; sub_parts: string[]; vocal: string; preferred_keys: string[]; proficiency: string }
   mode?: "register" | "edit"
 }
 
@@ -80,6 +80,7 @@ export function SongRegisterSheet({
   mode = "register",
 }: SongRegisterSheetProps) {
   const [selectedInstrument, setSelectedInstrument] = React.useState<string>(initialValues?.part || "")
+  const [selectedSubParts, setSelectedSubParts] = React.useState<string[]>(initialValues?.sub_parts || [])
   const [selectedVocal, setSelectedVocal] = React.useState<string>(initialValues?.vocal || "none")
   const [selectedKeys, setSelectedKeys] = React.useState<string[]>(initialValues?.preferred_keys || [])
   const [selectedProficiency, setSelectedProficiency] = React.useState<string>(initialValues?.proficiency || "")
@@ -87,21 +88,30 @@ export function SongRegisterSheet({
   React.useEffect(() => {
     if (open && initialValues) {
       setSelectedInstrument(initialValues.part)
+      setSelectedSubParts(initialValues.sub_parts)
       setSelectedVocal(initialValues.vocal)
       setSelectedKeys(initialValues.preferred_keys)
       setSelectedProficiency(initialValues.proficiency)
     } else if (open && !initialValues) {
       setSelectedInstrument("")
+      setSelectedSubParts([])
       setSelectedVocal("none")
       setSelectedKeys([])
       setSelectedProficiency("")
     }
   }, [open, initialValues])
 
+  const toggleSubPart = (value: string) => {
+    setSelectedSubParts(prev =>
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+    )
+  }
+
   const handleRegister = () => {
     if (onRegister) {
       onRegister({
         part: selectedInstrument,
+        sub_parts: selectedSubParts,
         vocal: hasVocal ? selectedVocal : "none",
         preferred_keys: hasVocal ? selectedKeys : [],
         proficiency: selectedProficiency,
@@ -144,7 +154,10 @@ export function SongRegisterSheet({
             </Label>
             <RadioGroup
               value={selectedInstrument}
-              onValueChange={setSelectedInstrument}
+              onValueChange={(v) => {
+                setSelectedInstrument(v)
+                setSelectedSubParts(prev => prev.filter(p => p !== v))
+              }}
               className="grid grid-cols-4 gap-2"
             >
               {instruments.map((instrument) => (
@@ -167,6 +180,33 @@ export function SongRegisterSheet({
               ))}
             </RadioGroup>
           </div>
+
+          {/* Sub Parts Selection */}
+          {selectedInstrument && (
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-foreground">サブパート</Label>
+              <div className="grid grid-cols-4 gap-2">
+                {instruments
+                  .filter(i => i.value !== selectedInstrument)
+                  .map((instrument) => (
+                    <button
+                      key={instrument.value}
+                      type="button"
+                      onClick={() => toggleSubPart(instrument.value)}
+                      className={cn(
+                        "flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all",
+                        selectedSubParts.includes(instrument.value)
+                          ? "border-stone-500 bg-stone-50 text-stone-800"
+                          : "border-stone-200 bg-white text-stone-400 hover:border-stone-300"
+                      )}
+                    >
+                      <span className="text-lg mb-0.5">{instrument.icon}</span>
+                      <span className="text-[10px] text-center">{instrument.label}</span>
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
 
           {/* Vocal Selection (歌あり曲のみ) */}
           {hasVocal && <div className="space-y-3">

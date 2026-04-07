@@ -73,7 +73,8 @@ rooms ──< room_members >── profiles
 | id | uuid | PRIMARY KEY, DEFAULT gen_random_uuid() | レコードID |
 | user_id | uuid | NOT NULL, REFERENCES profiles(id) ON DELETE CASCADE | ユーザーID |
 | song_id | uuid | NOT NULL, REFERENCES songs(id) ON DELETE CASCADE | 曲ID |
-| part | text | NOT NULL, CHECK (part IN ('guitar', 'banjo', 'mandolin', 'fiddle', 'bass', 'dobro', 'other')) | 担当パート |
+| part | text | NOT NULL, CHECK (part IN ('guitar', 'banjo', 'mandolin', 'fiddle', 'bass', 'dobro', 'other')) | メインパート |
+| sub_parts | text[] | NOT NULL, DEFAULT '{}' | サブパート（複数選択可） |
 | vocal | text | DEFAULT 'none', CHECK (vocal IN ('lead', 'harmony_high', 'harmony_low', 'none')) | ボーカル |
 | preferred_keys | text[] | DEFAULT '{}' | 得意キー（複数選択可） |
 | proficiency | text | NOT NULL, CHECK (proficiency IN ('ready', 'with_practice', 'learning')) | 習熟度 |

@@ -51,12 +51,13 @@ export function SongSearchScreen() {
     setSheetOpen(true)
   }
 
-  const handleRegister = async (data: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }) => {
+  const handleRegister = async (data: { part: string; sub_parts: string[]; vocal: string; preferred_keys: string[]; proficiency: string }) => {
     if (!user || !selectedSong) return
     await addRepertoire({
       user_id: user.id,
       song_id: selectedSong.id,
       part: data.part,
+      sub_parts: data.sub_parts,
       vocal: data.vocal,
       preferred_keys: data.preferred_keys,
       proficiency: data.proficiency,

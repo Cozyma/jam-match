@@ -171,6 +171,7 @@ export type Database = {
           id: string
           is_favorite: boolean
           part: string
+          sub_parts: string[]
           preferred_keys: string[] | null
           proficiency: string
           song_id: string
@@ -183,6 +184,7 @@ export type Database = {
           id?: string
           is_favorite?: boolean
           part: string
+          sub_parts?: string[]
           preferred_keys?: string[] | null
           proficiency: string
           song_id: string
@@ -195,6 +197,7 @@ export type Database = {
           id?: string
           is_favorite?: boolean
           part?: string
+          sub_parts?: string[]
           preferred_keys?: string[] | null
           proficiency?: string
           song_id?: string

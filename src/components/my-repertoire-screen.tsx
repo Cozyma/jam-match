@@ -47,6 +47,7 @@ export function MyRepertoireScreen() {
     songKey: string
     hasVocal: boolean
     part: string
+    sub_parts: string[]
     vocal: string
     preferred_keys: string[]
     proficiency: string
@@ -62,6 +63,7 @@ export function MyRepertoireScreen() {
       songKey: song?.original_key || "",
       hasVocal: song?.has_vocal !== false,
       part: entry.part,
+      sub_parts: entry.sub_parts || [],
       vocal: entry.vocal || "none",
       preferred_keys: entry.preferred_keys || [],
       proficiency: entry.proficiency,
@@ -69,7 +71,7 @@ export function MyRepertoireScreen() {
     setSheetOpen(true)
   }
 
-  const handleUpdate = async (data: { part: string; vocal: string; preferred_keys: string[]; proficiency: string }) => {
+  const handleUpdate = async (data: { part: string; sub_parts: string[]; vocal: string; preferred_keys: string[]; proficiency: string }) => {
     if (!editingEntry) return
     await updateRepertoire(editingEntry.id, data)
     setSheetOpen(false)
@@ -139,6 +141,9 @@ export function MyRepertoireScreen() {
                 <div className="mt-1 flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">
                     {partIcons[entry.part] || "🎵"} {partLabels[entry.part] || entry.part}
+                    {entry.sub_parts && entry.sub_parts.length > 0 && (
+                      <> + {entry.sub_parts.map(p => partIcons[p] || "🎵").join("")}</>
+                    )}
                     {vocalLabel && ` / ${vocalLabel}`}
                   </span>
                   <div className="ml-auto flex gap-0.5">
@@ -183,6 +188,7 @@ export function MyRepertoireScreen() {
           mode="edit"
           initialValues={{
             part: editingEntry.part,
+            sub_parts: editingEntry.sub_parts,
             vocal: editingEntry.vocal,
             preferred_keys: editingEntry.preferred_keys,
             proficiency: editingEntry.proficiency,

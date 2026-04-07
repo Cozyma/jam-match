@@ -54,17 +54,17 @@ const proficiencyOptions = [
   },
   {
     value: "with_practice",
-    label: "練習すればOK",
+    label: "たぶん弾ける",
     icon: "○",
     dotColor: "bg-amber-500",
-    description: "少し練習が必要です",
+    description: "曲は知ってる、多少あやしい部分あり",
   },
   {
     value: "learning",
     label: "挑戦中",
     icon: "△",
     dotColor: "bg-stone-400",
-    description: "現在練習中です",
+    description: "弾いたことはあるが通しは厳しい",
   },
 ]
 

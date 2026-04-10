@@ -81,23 +81,24 @@ npx supabase db push
 
 新規ユーザーのサインアップにはメール確認が必要。以下の手順で SMTP を設定する。
 
-### 1. Resend アカウント作成
+### 1. Gmail SMTP の準備
 
-1. https://resend.com でアカウント作成（無料枠: 100通/日, 3,000通/月）
-2. ドメイン認証を設定（独自ドメインがなければ `onboarding@resend.dev` で検証可能）
-3. API Keys で API キーを生成
+1. Google アカウントで 2段階認証を有効化
+2. https://myaccount.google.com/apppasswords でアプリパスワードを生成
+
+> **注意**: Resend（独自ドメイン必須）、Brevo（無料枠でリンクトラッキング強制）は不適合だった。Gmail SMTP（500通/日）を採用。
 
 ### 2. Supabase Dashboard で SMTP 設定
 
-Dashboard → Project Settings → Authentication → SMTP Settings:
+Dashboard → Authentication → Email → SMTP Settings:
 
 | 項目 | 値 |
 |------|-----|
-| Host | `smtp.resend.com` |
+| Host | `smtp.gmail.com` |
 | Port | `465` |
-| Username | `resend` |
-| Password | Resend の API キー |
-| Sender email | `noreply@your-domain.com`（または `onboarding@resend.dev`） |
+| Username | Gmail アドレス |
+| Password | Google アプリパスワード |
+| Sender email | Gmail アドレス |
 | Sender name | `Bluegrass GONG` |
 
 ### 3. メールテンプレート設定

@@ -46,7 +46,7 @@ export default function LoginPage() {
         setError("このメールアドレスは既に登録されています")
       } else {
         setMessage(
-          "確認メールを送信しました。Mailpit (http://localhost:54324) で確認してください"
+          "確認メールを送信しました。メール内のリンクをクリックして登録を完了してください"
         )
       }
     } catch {

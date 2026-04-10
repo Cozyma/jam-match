@@ -77,6 +77,56 @@ export SUPABASE_ACCESS_TOKEN=<your-token>
 npx supabase db push
 ```
 
+## SMTP 設定（メール認証の有効化）
+
+新規ユーザーのサインアップにはメール確認が必要。以下の手順で SMTP を設定する。
+
+### 1. Resend アカウント作成
+
+1. https://resend.com でアカウント作成（無料枠: 100通/日, 3,000通/月）
+2. ドメイン認証を設定（独自ドメインがなければ `onboarding@resend.dev` で検証可能）
+3. API Keys で API キーを生成
+
+### 2. Supabase Dashboard で SMTP 設定
+
+Dashboard → Project Settings → Authentication → SMTP Settings:
+
+| 項目 | 値 |
+|------|-----|
+| Host | `smtp.resend.com` |
+| Port | `465` |
+| Username | `resend` |
+| Password | Resend の API キー |
+| Sender email | `noreply@your-domain.com`（または `onboarding@resend.dev`） |
+| Sender name | `Bluegrass GONG` |
+
+### 3. メールテンプレート設定
+
+Dashboard → Authentication → Email Templates で以下を日本語テンプレートに更新:
+
+**Confirm signup:**
+- Subject: `【Bluegrass GONG】メールアドレスの確認`
+- Body: `supabase/templates/confirmation.html` の内容をコピー
+
+**Reset password:**
+- Subject: `【Bluegrass GONG】パスワードリセット`
+- Body: `supabase/templates/reset-password.html` の内容をコピー
+
+**Magic link:**
+- Subject: `【Bluegrass GONG】ログインリンク`
+- Body: `supabase/templates/magic-link.html` の内容をコピー
+
+### 4. メール確認の有効化
+
+Dashboard → Authentication → Auth Providers → Email:
+- **Confirm email** を有効化（トグル ON）
+
+### 5. 動作確認
+
+1. 新規メールアドレスでサインアップ
+2. 確認メールが届くことを確認
+3. リンクをクリック → ログインできることを確認
+
 ## 注意事項
 
 - **Supabase Free 枠**: 1 週間無操作で DB が一時停止する（アクセスで自動復帰）

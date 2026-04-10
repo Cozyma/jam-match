@@ -55,6 +55,10 @@ export function useRoom() {
 
     if (!room) return { room: null, error: findError || new Error('Room not found') }
 
+    if (room.expires_at && new Date(room.expires_at) <= new Date()) {
+      return { room: null, error: new Error('このルームは期限切れです') }
+    }
+
     const { error: joinError } = await supabase
       .from('room_members')
       .insert({

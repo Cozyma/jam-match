@@ -43,6 +43,7 @@ export type Database = {
           display_name: string
           id: string
           main_part: string | null
+          role: string
           updated_at: string | null
         }
         Insert: {
@@ -53,6 +54,7 @@ export type Database = {
           display_name: string
           id: string
           main_part?: string | null
+          role?: string
           updated_at?: string | null
         }
         Update: {
@@ -63,6 +65,7 @@ export type Database = {
           display_name?: string
           id?: string
           main_part?: string | null
+          role?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -191,8 +194,10 @@ export type Database = {
         Row: {
           chords: string | null
           created_at: string | null
+          created_by: string | null
           has_vocal: boolean | null
           id: string
+          is_official: boolean
           is_public_domain: boolean | null
           lyrics: string | null
           main_instrument: string | null
@@ -203,8 +208,10 @@ export type Database = {
         Insert: {
           chords?: string | null
           created_at?: string | null
+          created_by?: string | null
           has_vocal?: boolean | null
           id?: string
+          is_official?: boolean
           is_public_domain?: boolean | null
           lyrics?: string | null
           main_instrument?: string | null
@@ -215,8 +222,10 @@ export type Database = {
         Update: {
           chords?: string | null
           created_at?: string | null
+          created_by?: string | null
           has_vocal?: boolean | null
           id?: string
+          is_official?: boolean
           is_public_domain?: boolean | null
           lyrics?: string | null
           main_instrument?: string | null

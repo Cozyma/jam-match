@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database'
 
@@ -10,18 +10,19 @@ export function useSongs() {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
-  useEffect(() => {
-    async function fetchSongs() {
-      const { data, error } = await supabase
-        .from('songs')
-        .select('*')
-        .order('title')
-      if (error) console.error('Failed to fetch songs:', error)
-      if (data) setSongs(data)
-      setLoading(false)
-    }
-    fetchSongs()
+  const fetchSongs = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('songs')
+      .select('*')
+      .order('title')
+    if (error) console.error('Failed to fetch songs:', error)
+    if (data) setSongs(data)
+    setLoading(false)
   }, [])
 
-  return { songs, loading }
+  useEffect(() => {
+    fetchSongs()
+  }, [fetchSongs])
+
+  return { songs, loading, refetch: fetchSongs }
 }

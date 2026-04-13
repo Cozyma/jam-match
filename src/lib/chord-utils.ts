@@ -46,7 +46,9 @@ export function chordsToNashville(chordsStr: string, songKey: string | null): st
   const keyRoot = keyIsMinor ? songKey.slice(0, -1) : songKey
 
   // Replace chord names with degrees, preserving separators
-  return chordsStr.replace(/\b([A-G][#b]?)(m?[a-z0-9]*)\b/g, (match) => {
-    return chordToDegree(match, keyRoot, keyIsMinor)
+  // Only match chords that are standalone tokens (preceded by space, start, -, |, :)
+  // Avoid matching words like "Chorus", "Chords", "Verse", etc.
+  return chordsStr.replace(/(^|[\s\-|:,])([A-G][#b]?)(m?(?:aj|in|aug|dim|sus|add)?[0-9]*)(?=[\s\-|:,]|$)/g, (match, prefix, root, quality) => {
+    return prefix + chordToDegree(root + quality, keyRoot, keyIsMinor)
   })
 }

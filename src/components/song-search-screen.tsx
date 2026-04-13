@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils"
 import { SongRegisterSheet } from "@/components/song-register-sheet"
 import { SongDetailSheet } from "@/components/song-detail-sheet"
+import { SongAddSheet } from "@/components/song-add-sheet"
 import { useAuth } from "@/hooks/use-auth"
 import { useProfile } from "@/hooks/use-profile"
 import { useSongs } from "@/hooks/use-songs"
@@ -24,7 +25,7 @@ type VocalFilter = "vocal" | "inst" | "all"
 export function SongSearchScreen() {
   const { user } = useAuth()
   const { profile } = useProfile(user?.id)
-  const { songs, loading: songsLoading } = useSongs()
+  const { songs, loading: songsLoading, refetch: refetchSongs } = useSongs()
   const { repertoire, addRepertoire } = useRepertoire(user?.id)
 
   const [searchQuery, setSearchQuery] = useState("")
@@ -36,6 +37,7 @@ export function SongSearchScreen() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedSong, setSelectedSong] = useState<{ id: string; title: string; key: string; hasVocal: boolean } | null>(null)
   const [detailSong, setDetailSong] = useState<typeof songs[number] | null>(null)
+  const [addSheetOpen, setAddSheetOpen] = useState(false)
 
   const repertoireSongIds = new Set(repertoire.map(r => r.song_id))
 
@@ -134,9 +136,20 @@ export function SongSearchScreen() {
         </div>
       </div>
 
-      {/* Results Count */}
-      <div className="px-4 py-2 text-sm text-muted-foreground">
-        {songsLoading ? "読み込み中..." : `${filteredSongs.length}曲 見つかりました`}
+      {/* Results Count + Add Button */}
+      <div className="flex items-center justify-between px-4 py-2">
+        <span className="text-sm text-muted-foreground">
+          {songsLoading ? "読み込み中..." : `${filteredSongs.length}曲 見つかりました`}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setAddSheetOpen(true)}
+          className="text-xs border-primary text-primary"
+        >
+          <Plus className="mr-1 h-3 w-3" />
+          曲を追加
+        </Button>
       </div>
 
       {/* Results List */}
@@ -191,12 +204,25 @@ export function SongSearchScreen() {
         })}
       </div>
 
+      {/* Song Add Sheet */}
+      {user && (
+        <SongAddSheet
+          open={addSheetOpen}
+          onOpenChange={setAddSheetOpen}
+          userId={user.id}
+          onAdded={refetchSongs}
+        />
+      )}
+
       {/* Song Detail Sheet */}
       <SongDetailSheet
         open={!!detailSong}
         onOpenChange={(open) => { if (!open) setDetailSong(null) }}
         song={detailSong}
         userPart={profile?.main_part}
+        userId={user?.id}
+        userRole={profile?.role}
+        onUpdated={() => { setDetailSong(null); refetchSongs() }}
       />
 
       {/* Song Register Sheet */}

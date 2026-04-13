@@ -86,6 +86,7 @@ function mapMatchedSongToCard(song: MatchedSong): SongCardData {
     id: song.id,
     title: song.title,
     songKey: song.original_key || "-",
+    chords: song.chords,
     instruments,
     vocalSummary,
     proficiencies: proficiencies as readonly ("ready" | "practice" | "learning")[],

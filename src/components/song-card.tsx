@@ -32,6 +32,7 @@ export interface SongCardData {
   id: string
   title: string
   songKey: string
+  chords?: string | null
   instruments: InstrumentCount[]
   vocalSummary: string
   proficiencies: readonly Proficiency[]
@@ -134,6 +135,13 @@ export function SongCard({ song, isPlayed, onTogglePlayed }: SongCardProps) {
 
         <CollapsibleContent>
           <div className="border-t border-stone-200 bg-stone-50 px-3 py-2">
+            {song.chords && (
+              <div className="mb-2 rounded bg-white border border-stone-200 p-2">
+                <pre className="text-xs text-stone-700 whitespace-pre-wrap font-mono leading-relaxed">
+                  {song.chords}
+                </pre>
+              </div>
+            )}
             <div className="flex flex-col gap-1.5">
               {song.members.map((member, idx) => (
                 <div

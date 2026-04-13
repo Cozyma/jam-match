@@ -189,27 +189,36 @@ export type Database = {
       }
       songs: {
         Row: {
+          chords: string | null
           created_at: string | null
           has_vocal: boolean | null
           id: string
+          is_public_domain: boolean | null
+          lyrics: string | null
           main_instrument: string | null
           original_key: string | null
           tempo: string | null
           title: string
         }
         Insert: {
+          chords?: string | null
           created_at?: string | null
           has_vocal?: boolean | null
           id?: string
+          is_public_domain?: boolean | null
+          lyrics?: string | null
           main_instrument?: string | null
           original_key?: string | null
           tempo?: string | null
           title: string
         }
         Update: {
+          chords?: string | null
           created_at?: string | null
           has_vocal?: boolean | null
           id?: string
+          is_public_domain?: boolean | null
+          lyrics?: string | null
           main_instrument?: string | null
           original_key?: string | null
           tempo?: string | null

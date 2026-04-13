@@ -9,6 +9,7 @@ interface MatchedSong {
   title: string
   original_key: string
   has_vocal: boolean
+  chords: string | null
   player_count: number
   member_count: number
   favorite_count: number
@@ -88,6 +89,7 @@ export function useMatching(roomId: string | undefined, matchLevel: MatchLevel) 
             title: song.title,
             original_key: song.original_key,
             has_vocal: song.has_vocal,
+            chords: song.chords,
             player_count: 0,
             member_count: memberCount,
             favorite_count: 0,

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { SongRegisterSheet } from "@/components/song-register-sheet"
+import { SongDetailSheet } from "@/components/song-detail-sheet"
 import { useAuth } from "@/hooks/use-auth"
 import { useProfile } from "@/hooks/use-profile"
 import { useSongs } from "@/hooks/use-songs"
@@ -34,6 +35,7 @@ export function SongSearchScreen() {
   // Sheet state
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedSong, setSelectedSong] = useState<{ id: string; title: string; key: string; hasVocal: boolean } | null>(null)
+  const [detailSong, setDetailSong] = useState<typeof songs[number] | null>(null)
 
   const repertoireSongIds = new Set(repertoire.map(r => r.song_id))
 
@@ -144,14 +146,19 @@ export function SongSearchScreen() {
           return (
             <div key={song.id}>
               <div className="flex items-center justify-between px-4 py-3">
-                <div className="min-w-0 flex-1">
+                <button
+                  type="button"
+                  className="min-w-0 flex-1 text-left"
+                  onClick={() => setDetailSong(song)}
+                >
                   <h3 className="truncate font-medium text-foreground">
                     {song.title}
                   </h3>
                   <p className="mt-0.5 text-sm text-muted-foreground">
                     Key: {song.original_key || "-"} / {song.tempo || "-"} / {song.main_instrument || "-"}
+                    {song.chords && " 🎵"}
                   </p>
-                </div>
+                </button>
                 <div className="ml-3">
                   {isAdded ? (
                     <Button
@@ -183,6 +190,13 @@ export function SongSearchScreen() {
           )
         })}
       </div>
+
+      {/* Song Detail Sheet */}
+      <SongDetailSheet
+        open={!!detailSong}
+        onOpenChange={(open) => { if (!open) setDetailSong(null) }}
+        song={detailSong}
+      />
 
       {/* Song Register Sheet */}
       {selectedSong && (

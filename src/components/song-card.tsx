@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 import { PartIcon } from "@/components/icons/part-icon"
+import { chordsToNashville } from "@/lib/chord-utils"
 
 type Proficiency = "ready" | "practice" | "learning"
 
@@ -55,6 +56,7 @@ interface SongCardProps {
 
 export function SongCard({ song, isPlayed, onTogglePlayed }: SongCardProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [showNashville, setShowNashville] = useState(false)
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -137,8 +139,26 @@ export function SongCard({ song, isPlayed, onTogglePlayed }: SongCardProps) {
           <div className="border-t border-stone-200 bg-stone-50 px-3 py-2">
             {song.chords && (
               <div className="mb-2 rounded bg-white border border-stone-200 p-2">
+                <div className="flex justify-end mb-1">
+                  <div className="flex rounded border border-stone-200 overflow-hidden text-[10px]">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setShowNashville(false) }}
+                      className={cn("px-1.5 py-0.5", !showNashville ? "bg-stone-800 text-white" : "bg-white text-stone-500")}
+                    >
+                      コード
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setShowNashville(true) }}
+                      className={cn("px-1.5 py-0.5 border-l border-stone-200", showNashville ? "bg-stone-800 text-white" : "bg-white text-stone-500")}
+                    >
+                      度数
+                    </button>
+                  </div>
+                </div>
                 <pre className="text-xs text-stone-700 whitespace-pre-wrap font-mono leading-relaxed">
-                  {song.chords}
+                  {showNashville ? chordsToNashville(song.chords, song.songKey === "-" ? null : song.songKey) : song.chords}
                 </pre>
               </div>
             )}

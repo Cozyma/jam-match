@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Music } from "lucide-react"
 import {
   Sheet,
@@ -8,6 +9,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+import { chordsToNashville } from "@/lib/chord-utils"
 import type { Database } from "@/types/database"
 
 type Song = Database["public"]["Tables"]["songs"]["Row"]
@@ -19,7 +22,13 @@ interface SongDetailSheetProps {
 }
 
 export function SongDetailSheet({ open, onOpenChange, song }: SongDetailSheetProps) {
+  const [showNashville, setShowNashville] = useState(false)
+
   if (!song) return null
+
+  const displayChords = song.chords
+    ? showNashville ? chordsToNashville(song.chords, song.original_key) : song.chords
+    : null
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -48,15 +57,39 @@ export function SongDetailSheet({ open, onOpenChange, song }: SongDetailSheetPro
 
         <div className="mt-4 flex flex-col gap-4">
           {/* コード進行 */}
-          {song.chords && (
+          {displayChords && (
             <div>
-              <h4 className="mb-1.5 text-sm font-semibold text-stone-700 flex items-center gap-1">
-                <Music className="h-3.5 w-3.5" />
-                コード進行
-              </h4>
+              <div className="mb-1.5 flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-stone-700 flex items-center gap-1">
+                  <Music className="h-3.5 w-3.5" />
+                  コード進行
+                </h4>
+                <div className="flex rounded-md border border-stone-200 overflow-hidden text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setShowNashville(false)}
+                    className={cn(
+                      "px-2.5 py-1 transition-colors",
+                      !showNashville ? "bg-stone-800 text-white" : "bg-white text-stone-600 hover:bg-stone-50"
+                    )}
+                  >
+                    コード
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowNashville(true)}
+                    className={cn(
+                      "px-2.5 py-1 transition-colors border-l border-stone-200",
+                      showNashville ? "bg-stone-800 text-white" : "bg-white text-stone-600 hover:bg-stone-50"
+                    )}
+                  >
+                    度数
+                  </button>
+                </div>
+              </div>
               <div className="rounded-lg bg-stone-50 border border-stone-200 p-3">
                 <pre className="text-sm text-stone-800 whitespace-pre-wrap font-mono leading-relaxed">
-                  {song.chords}
+                  {displayChords}
                 </pre>
               </div>
             </div>

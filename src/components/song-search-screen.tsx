@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Check, Plus } from "lucide-react"
+import { Search, Check, Plus, FilePlus } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -72,9 +72,9 @@ export function SongSearchScreen() {
   }
 
   return (
-    <div className="flex flex-col">
-      {/* Search and Filters */}
-      <div className="border-b border-border bg-card px-4 py-3">
+    <div className="flex flex-col h-full">
+      {/* Search and Filters - sticky */}
+      <div className="shrink-0 border-b border-border bg-card px-4 py-3">
         {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -134,25 +134,24 @@ export function SongSearchScreen() {
             </SelectContent>
           </Select>
         </div>
+
+        {/* Results Count + New Song Button */}
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {songsLoading ? "読み込み中..." : `${filteredSongs.length}曲`}
+          </span>
+          <button
+            type="button"
+            onClick={() => setAddSheetOpen(true)}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <FilePlus className="h-3.5 w-3.5" />
+            曲を新規登録
+          </button>
+        </div>
       </div>
 
-      {/* Results Count + Add Button */}
-      <div className="flex items-center justify-between px-4 py-2">
-        <span className="text-sm text-muted-foreground">
-          {songsLoading ? "読み込み中..." : `${filteredSongs.length}曲 見つかりました`}
-        </span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setAddSheetOpen(true)}
-          className="text-xs border-primary text-primary"
-        >
-          <Plus className="mr-1 h-3 w-3" />
-          曲を追加
-        </Button>
-      </div>
-
-      {/* Results List */}
+      {/* Results List - scrollable */}
       <div className="flex-1 overflow-y-auto">
         {filteredSongs.map((song, index) => {
           const isAdded = repertoireSongIds.has(song.id)

@@ -99,17 +99,15 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
   return (
     <Sheet open={open} onOpenChange={(o) => { if (!o) setEditing(false); onOpenChange(o) }}>
       <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
-        <SheetHeader className="text-left">
-          <div className="flex items-start justify-between gap-2">
-            <SheetTitle className="text-lg">{song.title}</SheetTitle>
+        <SheetHeader className="text-left pr-8">
+          <SheetTitle className="text-lg">{song.title}</SheetTitle>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <Badge
               variant="outline"
-              className="shrink-0 border-amber-200 bg-amber-50 px-2 py-0.5 text-xs text-amber-700"
+              className="border-amber-200 bg-amber-50 px-2 py-0.5 text-xs text-amber-700"
             >
               Key: {song.original_key || "-"}
             </Badge>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>{song.tempo || "-"}</span>
             <span>/</span>
             <span>{song.main_instrument || "-"}</span>

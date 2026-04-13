@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,6 +17,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -25,6 +28,8 @@ export default function LoginPage() {
     setError(null)
     setMessage(null)
     setConfirmPassword("")
+    setShowPassword(false)
+    setShowConfirmPassword(false)
   }
 
   async function handleSignIn() {
@@ -71,6 +76,15 @@ export default function LoginPage() {
     }
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (isSignUp) {
+      handleSignUp()
+    } else {
+      handleSignIn()
+    }
+  }
+
   const isSignUp = mode === "signup"
 
   return (
@@ -87,116 +101,141 @@ export default function LoginPage() {
             </p>
           </div>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="email">メールアドレス</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="password">パスワード</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="6文字以上"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !isSignUp) handleSignIn()
-              }}
-            />
-          </div>
-
-          {isSignUp && (
+        <CardContent>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="confirm-password">パスワード（確認）</Label>
+              <Label htmlFor="email">メールアドレス</Label>
               <Input
-                id="confirm-password"
-                type="password"
-                placeholder="もう一度入力"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSignUp()
-                }}
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-          )}
-
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
-          {message && (
-            <p className="text-sm text-green-600">{message}</p>
-          )}
-
-          {isSignUp ? (
-            <>
-              <Button
-                onClick={handleSignUp}
-                disabled={loading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                size="lg"
-              >
-                新規登録
-              </Button>
-              <p className="text-center text-sm text-muted-foreground">
-                既にアカウントをお持ちですか？{" "}
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="password">パスワード</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  placeholder="6文字以上"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pr-10"
+                />
                 <button
                   type="button"
-                  onClick={() => switchMode("signin")}
-                  className="text-primary underline-offset-4 hover:underline"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  tabIndex={-1}
                 >
-                  ログイン
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
-              </p>
-            </>
-          ) : (
-            <>
-              <Button
-                onClick={handleSignIn}
-                disabled={loading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                size="lg"
-              >
-                ログイン
-              </Button>
+              </div>
+            </div>
 
-              <div className="relative my-2">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">または</span>
+            {isSignUp && (
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="confirm-password">パスワード（確認）</Label>
+                <div className="relative">
+                  <Input
+                    id="confirm-password"
+                    name="confirm-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="もう一度入力"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
+            )}
 
-              <Button
-                onClick={() => signInWithGoogle()}
-                variant="outline"
-                className="w-full"
-                size="lg"
-              >
-                Googleでログイン
-              </Button>
+            {error && (
+              <p className="text-sm text-destructive">{error}</p>
+            )}
+            {message && (
+              <p className="text-sm text-green-600">{message}</p>
+            )}
 
-              <p className="text-center text-sm text-muted-foreground">
-                アカウントをお持ちでないですか？{" "}
-                <button
-                  type="button"
-                  onClick={() => switchMode("signup")}
-                  className="text-primary underline-offset-4 hover:underline"
+            {isSignUp ? (
+              <>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                  size="lg"
                 >
                   新規登録
-                </button>
-              </p>
-            </>
-          )}
+                </Button>
+                <p className="text-center text-sm text-muted-foreground">
+                  既にアカウントをお持ちですか？{" "}
+                  <button
+                    type="button"
+                    onClick={() => switchMode("signin")}
+                    className="text-primary underline-offset-4 hover:underline"
+                  >
+                    ログイン
+                  </button>
+                </p>
+              </>
+            ) : (
+              <>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                  size="lg"
+                >
+                  ログイン
+                </Button>
+
+                <div className="relative my-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">または</span>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={() => signInWithGoogle()}
+                  variant="outline"
+                  className="w-full"
+                  size="lg"
+                >
+                  Googleでログイン
+                </Button>
+
+                <p className="text-center text-sm text-muted-foreground">
+                  アカウントをお持ちでないですか？{" "}
+                  <button
+                    type="button"
+                    onClick={() => switchMode("signup")}
+                    className="text-primary underline-offset-4 hover:underline"
+                  >
+                    新規登録
+                  </button>
+                </p>
+              </>
+            )}
+          </form>
         </CardContent>
       </Card>
     </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Music } from "lucide-react"
+import { Music, Play, ExternalLink } from "lucide-react"
 import {
   Sheet,
   SheetContent,
@@ -9,19 +9,26 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { chordsToNashville } from "@/lib/chord-utils"
 import type { Database } from "@/types/database"
 
 type Song = Database["public"]["Tables"]["songs"]["Row"]
 
+const partLabels: Record<string, string> = {
+  guitar: "guitar", banjo: "banjo", mandolin: "mandolin",
+  fiddle: "fiddle", bass: "bass", dobro: "dobro",
+}
+
 interface SongDetailSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   song: Song | null
+  userPart?: string | null
 }
 
-export function SongDetailSheet({ open, onOpenChange, song }: SongDetailSheetProps) {
+export function SongDetailSheet({ open, onOpenChange, song, userPart }: SongDetailSheetProps) {
   const [showNashville, setShowNashville] = useState(false)
 
   if (!song) return null
@@ -29,6 +36,13 @@ export function SongDetailSheet({ open, onOpenChange, song }: SongDetailSheetPro
   const displayChords = song.chords
     ? showNashville ? chordsToNashville(song.chords, song.original_key) : song.chords
     : null
+
+  const partLabel = userPart ? partLabels[userPart] || userPart : null
+  const videoQuery = [song.title, partLabel, "bluegrass"].filter(Boolean).join(" ")
+  const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(videoQuery)}`
+
+  const lyricsQuery = `${song.title} lyrics`
+  const lyricsUrl = `https://www.google.com/search?q=${encodeURIComponent(lyricsQuery)}`
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -56,6 +70,30 @@ export function SongDetailSheet({ open, onOpenChange, song }: SongDetailSheetPro
         </SheetHeader>
 
         <div className="mt-4 flex flex-col gap-4">
+          {/* 外部検索ボタン */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
+              onClick={() => window.open(videoUrl, "_blank")}
+            >
+              <Play className="mr-1.5 h-3.5 w-3.5" />
+              動画検索{partLabel ? `（${partLabel}）` : ""}
+            </Button>
+            {!song.is_public_domain && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => window.open(lyricsUrl, "_blank")}
+              >
+                <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                歌詞検索
+              </Button>
+            )}
+          </div>
+
           {/* コード進行 */}
           {displayChords && (
             <div>

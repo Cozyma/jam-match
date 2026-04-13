@@ -196,6 +196,7 @@ export function SongSearchScreen() {
         open={!!detailSong}
         onOpenChange={(open) => { if (!open) setDetailSong(null) }}
         song={detailSong}
+        userPart={profile?.main_part}
       />
 
       {/* Song Register Sheet */}

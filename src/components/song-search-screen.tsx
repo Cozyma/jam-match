@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Check, Plus, FilePlus, SlidersHorizontal } from "lucide-react"
+import { Search, Check, Plus, FilePlus, SlidersHorizontal, RotateCcw } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -72,6 +72,16 @@ export function SongSearchScreen() {
   }, [songs])
 
   const hasAdvancedFilter = (tempoFilter && tempoFilter !== "all-tempo") || (tagFilter && tagFilter !== "all-tags")
+  const hasAnyFilter = searchQuery || vocalFilter !== "all" || (keyFilter && keyFilter !== "all-keys") || (artistFilter && artistFilter !== "all-artists") || hasAdvancedFilter
+
+  function clearAllFilters() {
+    setSearchQuery("")
+    setVocalFilter("all")
+    setKeyFilter("")
+    setArtistFilter("")
+    setTempoFilter("")
+    setTagFilter("")
+  }
 
   const filteredSongs = songs.filter((song) => {
     const matchesSearch = song.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -201,6 +211,16 @@ export function SongSearchScreen() {
             {songsLoading ? "読み込み中..." : `${filteredSongs.length}曲`}
           </span>
           <div className="flex items-center gap-3">
+            {hasAnyFilter && (
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                クリア
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setShowAdvanced(!showAdvanced)}

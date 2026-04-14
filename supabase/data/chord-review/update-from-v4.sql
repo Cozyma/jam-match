@@ -1,4 +1,4 @@
--- Update from standardized-songs-v4.csv (full composer)
+-- Update from standardized-songs-v4.csv (fixed artist parsing)
 
 UPDATE songs SET chords = 'G D7 G C C G D7 G', original_key = 'G', tempo = 'medium', main_instrument = 'banjo', has_vocal = true, composer = 'Paul Henning (Recorded by Flatt & Scruggs 1962)', artist = 'Flatt & Scruggs' WHERE title = 'Ballad of Jed Clampett';
 UPDATE songs SET chords = 'G G C C G G D D G G C C G D G G', original_key = 'G', tempo = 'fast', main_instrument = 'banjo', has_vocal = true, composer = 'Traditional', artist = NULL WHERE title = 'Bile Them Cabbage Down';
@@ -229,7 +229,7 @@ UPDATE songs SET chords = 'C C F F C C G7 G7 C C F F C G7 C C', original_key = '
 UPDATE songs SET chords = 'C C F F C C G7 G7 C C F F C G7 C C', original_key = 'C', tempo = 'medium', main_instrument = 'guitar', has_vocal = true, composer = 'Bill Monroe (Recorded 1945)', artist = 'Bill Monroe' WHERE title = 'True Life Blues';
 UPDATE songs SET chords = 'Verse: A A D D A A E7 A | Chorus: A A D D A A E7 A', original_key = 'A', tempo = 'fast', main_instrument = 'fiddle', has_vocal = true, composer = 'Bill Monroe (1950; about his uncle Pendleton Vandiver)', artist = 'Bill Monroe' WHERE title = 'Uncle Pen';
 UPDATE songs SET chords = 'Verse: G G D7 D7 G G C G | Chorus: G G D7 D7 G G C G', original_key = 'G', tempo = 'medium', main_instrument = 'guitar', has_vocal = true, composer = 'Bill Monroe & Jake Landers (Recorded 1970)', artist = 'Bill Monroe & Jake Landers' WHERE title = 'Walk Softly on This Heart of Mine';
-UPDATE songs SET chords = 'B B E E B B F# B', original_key = 'B', tempo = 'slow', main_instrument = 'guitar', has_vocal = true, composer = 'Bill Monroe & Peter Rowan (Written 1960s; first recorded 1970)', artist = '1970' WHERE title = 'Walls of Time';
+UPDATE songs SET chords = 'B B E E B B F# B', original_key = 'B', tempo = 'slow', main_instrument = 'guitar', has_vocal = true, composer = 'Bill Monroe & Peter Rowan (Written 1960s; first recorded 1970)', artist = 'Bill Monroe & Peter Rowan' WHERE title = 'Walls of Time';
 UPDATE songs SET chords = 'A: G G G G F F D7 G | B: G G G G G G F D7 G', original_key = 'G', tempo = 'fast', main_instrument = 'mandolin', has_vocal = false, composer = 'Bill Monroe (Recorded 1954)', artist = 'Bill Monroe' WHERE title = 'Wheel Hoss';
 UPDATE songs SET chords = 'Verse: A A A A A A E7 E7 A A D D A E7 A A | Chorus: D D A A A A E7 E7 A A D D A E7 A A', original_key = 'A', tempo = 'medium', main_instrument = 'guitar', has_vocal = true, composer = 'Lester Flatt (Recorded by Flatt & Scruggs 1949)', artist = 'Flatt & Scruggs' WHERE title = 'Why Don''t You Tell Me So';
 UPDATE songs SET chords = 'G G C G G G D D7 G G C G G D7 G G', original_key = 'G', tempo = 'medium', main_instrument = 'dobro', has_vocal = false, composer = 'Traditional (Lyrics by Guy Smith 1930s; popularized by Roy Acuff 1937)', artist = 'Roy Acuff' WHERE title = 'Great Speckled Bird';

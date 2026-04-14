@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Check, Plus, FilePlus } from "lucide-react"
+import { useState, useMemo } from "react"
+import { Search, Check, Plus, FilePlus, SlidersHorizontal } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -31,7 +31,9 @@ export function SongSearchScreen() {
   const [searchQuery, setSearchQuery] = useState("")
   const [vocalFilter, setVocalFilter] = useState<VocalFilter>("all")
   const [keyFilter, setKeyFilter] = useState("")
+  const [artistFilter, setArtistFilter] = useState("")
   const [tempoFilter, setTempoFilter] = useState("")
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   // Sheet state
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -41,15 +43,27 @@ export function SongSearchScreen() {
 
   const repertoireSongIds = new Set(repertoire.map(r => r.song_id))
 
+  // アーティスト一覧を動的に取得
+  const artistOptions = useMemo(() => {
+    const set = new Set<string>()
+    for (const song of songs) {
+      if (song.artist) set.add(song.artist)
+    }
+    return Array.from(set).sort()
+  }, [songs])
+
+  const hasAdvancedFilter = tempoFilter && tempoFilter !== "all-tempo"
+
   const filteredSongs = songs.filter((song) => {
     const matchesSearch = song.title.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesKey = !keyFilter || keyFilter === "all-keys" || song.original_key === keyFilter
     const matchesTempo = !tempoFilter || tempoFilter === "all-tempo" || song.tempo === tempoFilter
+    const matchesArtist = !artistFilter || artistFilter === "all-artists" || song.artist === artistFilter
     const matchesVocal =
       vocalFilter === "all" ||
       (vocalFilter === "vocal" && song.has_vocal === true) ||
       (vocalFilter === "inst" && song.has_vocal === false)
-    return matchesSearch && matchesKey && matchesTempo && matchesVocal
+    return matchesSearch && matchesKey && matchesTempo && matchesVocal && matchesArtist
   })
 
   const handleAddSong = (songId: string, title: string, key: string, hasVocal: boolean) => {
@@ -73,7 +87,7 @@ export function SongSearchScreen() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Search and Filters - sticky */}
+      {/* Search and Filters - fixed */}
       <div className="shrink-0 border-b border-border bg-card px-4 py-3">
         {/* Search Bar */}
         <div className="relative">
@@ -104,7 +118,7 @@ export function SongSearchScreen() {
           ))}
         </div>
 
-        {/* Filter Row 2 - Dropdowns */}
+        {/* Filter Row 2 - Key + Artist */}
         <div className="mt-3 flex gap-2">
           <Select value={keyFilter} onValueChange={setKeyFilter}>
             <SelectTrigger className="flex-1 bg-muted border-transparent">
@@ -112,42 +126,68 @@ export function SongSearchScreen() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all-keys">全てのKey</SelectItem>
-              <SelectItem value="A">A</SelectItem>
-              <SelectItem value="B">B</SelectItem>
-              <SelectItem value="C">C</SelectItem>
-              <SelectItem value="D">D</SelectItem>
-              <SelectItem value="E">E</SelectItem>
-              <SelectItem value="F">F</SelectItem>
-              <SelectItem value="G">G</SelectItem>
+              {["A", "Am", "B", "Bb", "Bm", "C", "D", "Dm", "E", "Em", "F", "G", "Gm"].map((k) => (
+                <SelectItem key={k} value={k}>{k}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          <Select value={tempoFilter} onValueChange={setTempoFilter}>
+          <Select value={artistFilter} onValueChange={setArtistFilter}>
             <SelectTrigger className="flex-1 bg-muted border-transparent">
-              <SelectValue placeholder="テンポ" />
+              <SelectValue placeholder="アーティスト" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all-tempo">全てのテンポ</SelectItem>
-              <SelectItem value="slow">Slow</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="fast">Fast</SelectItem>
+              <SelectItem value="all-artists">全アーティスト</SelectItem>
+              {artistOptions.map((a) => (
+                <SelectItem key={a} value={a}>{a}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
-        {/* Results Count + New Song Button */}
+        {/* Advanced Filter Toggle + Tempo */}
+        {showAdvanced && (
+          <div className="mt-3 flex gap-2">
+            <Select value={tempoFilter} onValueChange={setTempoFilter}>
+              <SelectTrigger className="flex-1 bg-muted border-transparent">
+                <SelectValue placeholder="テンポ" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-tempo">全てのテンポ</SelectItem>
+                <SelectItem value="slow">Slow</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="fast">Fast</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {/* Results Count + Actions */}
         <div className="mt-3 flex items-center justify-between">
           <span className="text-sm text-muted-foreground">
             {songsLoading ? "読み込み中..." : `${filteredSongs.length}曲`}
           </span>
-          <button
-            type="button"
-            onClick={() => setAddSheetOpen(true)}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <FilePlus className="h-3.5 w-3.5" />
-            曲を新規登録
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className={cn(
+                "flex items-center gap-1 text-xs transition-colors",
+                showAdvanced || hasAdvancedFilter ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              詳細
+            </button>
+            <button
+              type="button"
+              onClick={() => setAddSheetOpen(true)}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <FilePlus className="h-3.5 w-3.5" />
+              曲を新規登録
+            </button>
+          </div>
         </div>
       </div>
 

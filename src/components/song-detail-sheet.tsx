@@ -101,8 +101,10 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
       <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
         <SheetHeader className="text-left pr-8">
           <SheetTitle className="text-lg">{song.title}</SheetTitle>
-          {song.composer && (
-            <p className="text-xs text-muted-foreground">{song.composer}</p>
+          {(song.composer || song.artist) && (
+            <p className="text-xs text-muted-foreground">
+              {[song.composer && `作曲: ${song.composer}`, song.artist && `演奏: ${song.artist}`].filter(Boolean).join(" / ")}
+            </p>
           )}
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <Badge

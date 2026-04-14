@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Pencil, LogOut, Check, X } from "lucide-react"
+import { Pencil, LogOut, Check, X, Tag, Plus } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -20,6 +20,7 @@ import { useProfile } from "@/hooks/use-profile"
 import { useRepertoire } from "@/hooks/use-repertoire"
 import { signOut } from "@/lib/supabase/auth"
 import { createClient } from "@/lib/supabase/client"
+import { useUserTags } from "@/hooks/use-tags"
 
 const instruments = [
   { value: "guitar", label: "Guitar" },
@@ -42,8 +43,10 @@ export function ProfileScreen() {
   const [tempName, setTempName] = useState("")
   const [area, setArea] = useState("")
   const [bandName, setBandName] = useState("")
+  const [newTag, setNewTag] = useState("")
 
   const supabase = createClient()
+  const { tags: userTags, addTag: addUserTag, removeTag: removeUserTag } = useUserTags(user?.id)
 
   // Fetch room count
   useEffect(() => {
@@ -209,6 +212,48 @@ export function ProfileScreen() {
           placeholder="例: Mountain Pickers"
           className="bg-stone-100 border-stone-200"
         />
+      </div>
+
+      {/* Tags */}
+      <div className="mt-4">
+        <label className="mb-2 flex items-center gap-1 text-sm font-medium text-foreground">
+          <Tag className="h-3.5 w-3.5" />
+          タグ
+        </label>
+        <div className="flex flex-wrap gap-1.5">
+          {userTags.map((t) => (
+            <span key={t.id} className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700">
+              {t.tag_name}
+              <button type="button" onClick={() => removeUserTag(t.id)} className="text-stone-400 hover:text-stone-600">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+          <form
+            className="inline-flex items-center"
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (newTag.trim()) {
+                addUserTag(newTag)
+                setNewTag("")
+              }
+            }}
+          >
+            <input
+              type="text"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              placeholder="タグを追加"
+              className="w-24 rounded-full border border-stone-200 bg-white px-2.5 py-1 text-xs outline-none focus:border-primary focus:w-32 transition-all"
+            />
+            {newTag.trim() && (
+              <button type="submit" className="ml-1 text-primary">
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </form>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">バンド名やコミュニティ名を追加できます</p>
       </div>
 
       {/* Stats Section */}

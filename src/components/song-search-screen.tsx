@@ -19,6 +19,8 @@ import { useAuth } from "@/hooks/use-auth"
 import { useProfile } from "@/hooks/use-profile"
 import { useSongs } from "@/hooks/use-songs"
 import { useRepertoire } from "@/hooks/use-repertoire"
+import { usePopularTags } from "@/hooks/use-tags"
+import { createClient } from "@/lib/supabase/client"
 
 type VocalFilter = "vocal" | "inst" | "all"
 
@@ -33,7 +35,24 @@ export function SongSearchScreen() {
   const [keyFilter, setKeyFilter] = useState("")
   const [artistFilter, setArtistFilter] = useState("")
   const [tempoFilter, setTempoFilter] = useState("")
+  const [tagFilter, setTagFilter] = useState("")
   const [showAdvanced, setShowAdvanced] = useState(false)
+
+  const { tags: popularTags } = usePopularTags()
+
+  // タグフィルタ用: 選択タグに属する song_id セット
+  const [taggedSongIds, setTaggedSongIds] = useState<Set<string> | null>(null)
+
+  useMemo(() => {
+    if (!tagFilter || tagFilter === "all-tags") {
+      setTaggedSongIds(null)
+      return
+    }
+    const supabase = createClient()
+    supabase.from("song_tags").select("song_id").eq("tag_name", tagFilter).then(({ data }) => {
+      if (data) setTaggedSongIds(new Set(data.map((d) => d.song_id)))
+    })
+  }, [tagFilter])
 
   // Sheet state
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -52,18 +71,19 @@ export function SongSearchScreen() {
     return Array.from(set).sort()
   }, [songs])
 
-  const hasAdvancedFilter = tempoFilter && tempoFilter !== "all-tempo"
+  const hasAdvancedFilter = (tempoFilter && tempoFilter !== "all-tempo") || (tagFilter && tagFilter !== "all-tags")
 
   const filteredSongs = songs.filter((song) => {
     const matchesSearch = song.title.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesKey = !keyFilter || keyFilter === "all-keys" || song.original_key === keyFilter
     const matchesTempo = !tempoFilter || tempoFilter === "all-tempo" || song.tempo === tempoFilter
     const matchesArtist = !artistFilter || artistFilter === "all-artists" || song.artist === artistFilter
+    const matchesTag = !taggedSongIds || taggedSongIds.has(song.id)
     const matchesVocal =
       vocalFilter === "all" ||
       (vocalFilter === "vocal" && song.has_vocal === true) ||
       (vocalFilter === "inst" && song.has_vocal === false)
-    return matchesSearch && matchesKey && matchesTempo && matchesVocal && matchesArtist
+    return matchesSearch && matchesKey && matchesTempo && matchesVocal && matchesArtist && matchesTag
   })
 
   const handleAddSong = (songId: string, title: string, key: string, hasVocal: boolean) => {
@@ -145,7 +165,7 @@ export function SongSearchScreen() {
           </Select>
         </div>
 
-        {/* Advanced Filter Toggle + Tempo */}
+        {/* Advanced Filters */}
         {showAdvanced && (
           <div className="mt-3 flex gap-2">
             <Select value={tempoFilter} onValueChange={setTempoFilter}>
@@ -157,6 +177,19 @@ export function SongSearchScreen() {
                 <SelectItem value="slow">Slow</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="fast">Fast</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={tagFilter} onValueChange={setTagFilter}>
+              <SelectTrigger className="flex-1 bg-muted border-transparent">
+                <SelectValue placeholder="タグ" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-tags">全てのタグ</SelectItem>
+                {popularTags.map((t) => (
+                  <SelectItem key={t.tag_name} value={t.tag_name}>
+                    {t.tag_name} ({t.count})
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

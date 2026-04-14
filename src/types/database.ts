@@ -298,6 +298,51 @@ export type Database = {
           },
         ]
       }
+      song_tags: {
+        Row: {
+          id: string
+          song_id: string
+          tag_name: string
+          created_by: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          song_id: string
+          tag_name: string
+          created_by: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          song_id?: string
+          tag_name?: string
+          created_by?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      user_tags: {
+        Row: {
+          id: string
+          user_id: string
+          tag_name: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          tag_name: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          tag_name?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Music, Play, ExternalLink, Pencil, Trash2 } from "lucide-react"
+import { Music, Play, ExternalLink, Pencil, Trash2, Tag, Plus, X } from "lucide-react"
 import {
   Sheet,
   SheetContent,
@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils"
 import { chordsToNashville } from "@/lib/chord-utils"
 import { createClient } from "@/lib/supabase/client"
+import { useSongTags } from "@/hooks/use-tags"
 import type { Database } from "@/types/database"
 
 type Song = Database["public"]["Tables"]["songs"]["Row"]
@@ -46,10 +47,13 @@ interface SongDetailSheetProps {
 export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, userRole, onUpdated }: SongDetailSheetProps) {
   const [showNashville, setShowNashville] = useState(false)
   const [editing, setEditing] = useState(false)
+  const [newTag, setNewTag] = useState("")
   const [editChords, setEditChords] = useState("")
   const [editKey, setEditKey] = useState("")
   const [editTempo, setEditTempo] = useState("")
   const [saving, setSaving] = useState(false)
+
+  const { tags: songTags, addTag: addSongTag, removeTag: removeSongTag } = useSongTags(song?.id)
 
   if (!song) return null
 
@@ -259,6 +263,51 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
                   コード・歌詞データはまだ登録されていません
                 </p>
               )}
+
+              {/* タグ */}
+              <div>
+                <h4 className="mb-1.5 text-sm font-semibold text-stone-700 flex items-center gap-1">
+                  <Tag className="h-3.5 w-3.5" />
+                  タグ
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {songTags.map((t) => (
+                    <span key={t.id} className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-700">
+                      {t.tag_name}
+                      {(userId === t.created_by || userRole === "moderator") && (
+                        <button type="button" onClick={() => removeSongTag(t.id)} className="text-stone-400 hover:text-stone-600">
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </span>
+                  ))}
+                  {userId && (
+                    <form
+                      className="inline-flex items-center"
+                      onSubmit={(e) => {
+                        e.preventDefault()
+                        if (newTag.trim()) {
+                          addSongTag(newTag, userId)
+                          setNewTag("")
+                        }
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        placeholder="タグを追加"
+                        className="w-20 rounded-full border border-stone-200 bg-white px-2.5 py-0.5 text-xs outline-none focus:border-primary focus:w-28 transition-all"
+                      />
+                      {newTag.trim() && (
+                        <button type="submit" className="ml-1 text-primary">
+                          <Plus className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </form>
+                  )}
+                </div>
+              </div>
 
               {/* 編集・削除ボタン */}
               {canEdit && (

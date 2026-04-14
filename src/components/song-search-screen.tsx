@@ -205,9 +205,13 @@ export function SongSearchScreen() {
                 >
                   <h3 className="truncate font-medium text-foreground">
                     {song.title}
+                    {song.original_key && (
+                      <span className="ml-2 text-xs font-normal text-amber-700">Key: {song.original_key}</span>
+                    )}
                   </h3>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    Key: {song.original_key || "-"} / {song.tempo || "-"} / {song.main_instrument || "-"}
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {song.has_vocal ? "Vocal" : song.main_instrument || "Inst"}
+                    {song.artist && ` / ${song.artist}`}
                     {song.chords && " 🎵"}
                   </p>
                 </button>

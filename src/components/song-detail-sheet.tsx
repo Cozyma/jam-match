@@ -65,6 +65,8 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
   const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(videoQuery)}`
   const lyricsQuery = `${song.title} lyrics`
   const lyricsUrl = `https://www.google.com/search?q=${encodeURIComponent(lyricsQuery)}`
+  const chordsQuery = `${song.title} bluegrass chords`
+  const chordsUrl = `https://www.google.com/search?q=${encodeURIComponent(chordsQuery)}`
 
   const songId = song.id
 
@@ -137,19 +139,26 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
               onClick={() => window.open(videoUrl, "_blank")}
             >
               <Play className="mr-1.5 h-3.5 w-3.5" />
-              動画検索{partLabel ? `（${partLabel}）` : ""}
+              動画
             </Button>
-            {!song.is_public_domain && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                onClick={() => window.open(lyricsUrl, "_blank")}
-              >
-                <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                歌詞検索
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => window.open(chordsUrl, "_blank")}
+            >
+              <Music className="mr-1.5 h-3.5 w-3.5" />
+              コード
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => window.open(lyricsUrl, "_blank")}
+            >
+              <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+              歌詞
+            </Button>
           </div>
 
           {/* 編集モード */}

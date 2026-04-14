@@ -1,0 +1,17 @@
+以下の5曲について、それぞれ「[曲名] bluegrass chords」でウェブ検索を実行してください。
+複数のサイトを参照し、ブルーグラスのジャムセッションで最も一般的に使われるコード進行を特定してください。
+
+ルール:
+- サイトによって多少の差異がある場合は、最も多くのサイトで共通している進行を採用してください
+- パートが分かれる曲は「A: ... | B: ...」で記述
+- コード進行が特定できなかった場合のみ「不明」と記載
+
+出力フォーマット（ヘッダーなし、データのみ）:
+title,main_instrument,tempo,original_key,chords
+
+対象曲:
+- Turn Your Radio On (Key: G)
+- Wabash Cannonball (Key: G)
+- Wagon Wheel (Key: G)
+- Wayfaring Stranger (Key: Am)
+- What a Friend We Have in Jesus (Key: G)

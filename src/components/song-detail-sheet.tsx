@@ -101,6 +101,9 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
       <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
         <SheetHeader className="text-left pr-8">
           <SheetTitle className="text-lg">{song.title}</SheetTitle>
+          {song.composer && (
+            <p className="text-xs text-muted-foreground">{song.composer}</p>
+          )}
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <Badge
               variant="outline"

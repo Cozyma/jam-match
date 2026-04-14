@@ -3,12 +3,12 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Home, Guitar, User } from "lucide-react"
+import { Home, Guitar, Search, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useProfile } from "@/hooks/use-profile"
 
-type TabId = "home" | "repertoire" | "profile"
+type TabId = "home" | "repertoire" | "search" | "profile"
 
 interface AppLayoutProps {
   children?: React.ReactNode
@@ -18,6 +18,7 @@ interface AppLayoutProps {
 const tabs = [
   { id: "home" as TabId, label: "ホーム", icon: Home, href: "/" },
   { id: "repertoire" as TabId, label: "レパートリー", icon: Guitar, href: "/repertoire" },
+  { id: "search" as TabId, label: "曲を探す", icon: Search, href: "/songs" },
   { id: "profile" as TabId, label: "プロフィール", icon: User, href: "/profile" },
 ]
 

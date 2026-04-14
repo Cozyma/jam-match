@@ -52,9 +52,9 @@ export function AppLayout({ children, activeTab = "home" }: AppLayoutProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex h-screen flex-col bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 flex h-14 items-center border-b border-border bg-card px-4">
+      <header className="shrink-0 flex h-14 items-center border-b border-border bg-card px-4">
         <div className="flex items-center gap-2">
           <img src="/icon-192.png" alt="Bluegrass GONG" className="h-8 w-8 rounded-lg" />
           <span className="text-lg font-semibold text-foreground">Bluegrass GONG</span>
@@ -62,7 +62,7 @@ export function AppLayout({ children, activeTab = "home" }: AppLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main className="flex-1 flex flex-col overflow-hidden pb-16">
         {children}
       </main>
 

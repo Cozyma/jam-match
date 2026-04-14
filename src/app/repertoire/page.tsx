@@ -14,7 +14,7 @@ export default function RepertoirePage() {
   return (
     <AppLayout activeTab="repertoire">
       {/* Tab Switcher */}
-      <div className="flex border-b border-border bg-card">
+      <div className="shrink-0 flex border-b border-border bg-card">
         <button
           onClick={() => setTab("my")}
           className={cn(
@@ -39,7 +39,9 @@ export default function RepertoirePage() {
         </button>
       </div>
 
-      {tab === "my" ? <MyRepertoireScreen /> : <SongSearchScreen />}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {tab === "my" ? <MyRepertoireScreen /> : <SongSearchScreen />}
+      </div>
     </AppLayout>
   )
 }

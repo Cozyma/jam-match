@@ -52,3 +52,40 @@ export function chordsToNashville(chordsStr: string, songKey: string | null): st
     return prefix + chordToDegree(root + quality, keyRoot, keyIsMinor)
   })
 }
+
+export type ChordSection = {
+  label: string | null
+  lines: string[][]
+}
+
+const SECTION_LABEL_RE = /^(A|B|C|D|Verse|Chorus|Bridge|Intro|Outro|Tag)\s*:\s*/i
+
+export function parseChordSections(raw: string, barGroup: number = 4): ChordSection[] {
+  if (!raw.trim()) return []
+
+  const segments = raw.split('|').map(s => s.trim()).filter(Boolean)
+  const sections: ChordSection[] = []
+
+  for (const segment of segments) {
+    const labelMatch = segment.match(SECTION_LABEL_RE)
+    const label = labelMatch ? labelMatch[1] : null
+    const chordsStr = labelMatch ? segment.slice(labelMatch[0].length).trim() : segment
+    const chords = chordsStr.split(/\s+/).filter(Boolean)
+
+    if (chords.length === 0) continue
+
+    const lines: string[][] = []
+    for (let i = 0; i < chords.length; i += barGroup) {
+      lines.push(chords.slice(i, i + barGroup))
+    }
+
+    // Merge with previous section if both have no label
+    if (label === null && sections.length > 0 && sections[sections.length - 1].label === null) {
+      sections[sections.length - 1].lines.push(...lines)
+    } else {
+      sections.push({ label, lines })
+    }
+  }
+
+  return sections
+}

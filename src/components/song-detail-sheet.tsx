@@ -51,6 +51,7 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
   const [editChords, setEditChords] = useState("")
   const [editKey, setEditKey] = useState("")
   const [editTempo, setEditTempo] = useState("")
+  const [editBarGroup, setEditBarGroup] = useState("4")
   const [saving, setSaving] = useState(false)
 
   const { tags: songTags, addTag: addSongTag, removeTag: removeSongTag } = useSongTags(song?.id)
@@ -81,6 +82,7 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
     setEditChords(song!.chords || "")
     setEditKey(song!.original_key || "")
     setEditTempo(song!.tempo || "")
+    setEditBarGroup(String(song!.bar_group ?? 4))
     setEditing(true)
   }
 
@@ -91,6 +93,7 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
       chords: editChords || null,
       original_key: editKey || null,
       tempo: editTempo || null,
+      bar_group: parseInt(editBarGroup, 10),
     }).eq("id", songId)
     setSaving(false)
     setEditing(false)
@@ -189,6 +192,17 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
                       <SelectItem value="slow">Slow</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="fast">Fast</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <Label className="text-xs">区切り</Label>
+                  <Select value={editBarGroup} onValueChange={setEditBarGroup}>
+                    <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="区切り" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="4">4小節</SelectItem>
+                      <SelectItem value="6">6小節</SelectItem>
+                      <SelectItem value="8">8小節</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

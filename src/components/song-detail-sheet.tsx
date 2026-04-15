@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { chordsToNashville } from "@/lib/chord-utils"
+import { chordsToNashville, parseChordSections, type ChordSection } from "@/lib/chord-utils"
 import { createClient } from "@/lib/supabase/client"
 import { useSongTags } from "@/hooks/use-tags"
 import type { Database } from "@/types/database"
@@ -60,9 +60,12 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
   const canEdit = userId && (userId === song.created_by || userRole === "moderator")
   const canDelete = canEdit && !song.is_official
 
-  const displayChords = song.chords
-    ? showNashville ? chordsToNashville(song.chords, song.original_key) : song.chords
-    : null
+  const chordSections: ChordSection[] = song.chords
+    ? parseChordSections(
+        showNashville ? chordsToNashville(song.chords, song.original_key) : song.chords,
+        song.bar_group ?? 4
+      )
+    : []
 
   const partLabel = userPart ? partLabels[userPart] || userPart : null
   const videoQuery = [song.title, partLabel, "bluegrass"].filter(Boolean).join(" ")
@@ -207,7 +210,7 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
           ) : (
             <>
               {/* コード進行 */}
-              {displayChords && (
+              {chordSections.length > 0 && (
                 <div>
                   <div className="mb-1.5 flex items-center justify-between">
                     <h4 className="text-sm font-semibold text-stone-700 flex items-center gap-1">
@@ -237,10 +240,27 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
                       </button>
                     </div>
                   </div>
-                  <div className="rounded-lg bg-stone-50 border border-stone-200 p-3">
-                    <pre className="text-sm text-stone-800 whitespace-pre-wrap font-mono leading-relaxed">
-                      {displayChords}
-                    </pre>
+                  <div className="rounded-lg border border-stone-200 overflow-hidden">
+                    {chordSections.map((section, si) => (
+                      <div key={si} className={cn(si > 0 && "border-t border-stone-300")}>
+                        {section.label && (
+                          <div className="bg-stone-200 px-3 py-0.5">
+                            <span className="text-xs font-semibold text-stone-600">{section.label}</span>
+                          </div>
+                        )}
+                        <div className="divide-y divide-stone-100 bg-stone-50">
+                          {section.lines.map((line, li) => (
+                            <div key={li} className="flex gap-3 px-3 py-1.5">
+                              {line.map((chord, ci) => (
+                                <span key={ci} className="min-w-[2.5rem] font-mono text-sm text-stone-800">
+                                  {chord}
+                                </span>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

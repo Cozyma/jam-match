@@ -193,6 +193,7 @@ export type Database = {
       songs: {
         Row: {
           artist: string | null
+          bar_group: number | null
           chords: string | null
           composer: string | null
           created_at: string | null
@@ -209,6 +210,7 @@ export type Database = {
         }
         Insert: {
           artist?: string | null
+          bar_group?: number | null
           chords?: string | null
           composer?: string | null
           created_at?: string | null
@@ -225,6 +227,7 @@ export type Database = {
         }
         Update: {
           artist?: string | null
+          bar_group?: number | null
           chords?: string | null
           composer?: string | null
           created_at?: string | null

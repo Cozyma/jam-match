@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Music, Play, ExternalLink, Pencil, Trash2, Tag, Plus, X } from "lucide-react"
+import { Music, Play, ExternalLink, Pencil, Trash2, Tag, Plus, X, MessageSquare } from "lucide-react"
 import {
   Sheet,
   SheetContent,
@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils"
 import { chordsToNashville, parseChordSections, type ChordSection } from "@/lib/chord-utils"
 import { createClient } from "@/lib/supabase/client"
 import { useSongTags } from "@/hooks/use-tags"
+import { useCorrections } from "@/hooks/use-corrections"
 import type { Database } from "@/types/database"
 
 type Song = Database["public"]["Tables"]["songs"]["Row"]
@@ -53,8 +54,12 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
   const [editTempo, setEditTempo] = useState("")
   const [editBarGroup, setEditBarGroup] = useState("4")
   const [saving, setSaving] = useState(false)
+  const [showCorrectionForm, setShowCorrectionForm] = useState(false)
+  const [correctionBody, setCorrectionBody] = useState("")
+  const [submittingCorrection, setSubmittingCorrection] = useState(false)
 
   const { tags: songTags, addTag: addSongTag, removeTag: removeSongTag } = useSongTags(song?.id)
+  const { corrections, addCorrection, removeCorrection } = useCorrections(song?.id)
 
   if (!song) return null
 
@@ -342,6 +347,77 @@ export function SongDetailSheet({ open, onOpenChange, song, userPart, userId, us
                   )}
                 </div>
               </div>
+
+              {/* 修正を提案（ログインユーザー） */}
+              {userId && !canEdit && (
+                <div>
+                  {showCorrectionForm ? (
+                    <div className="flex flex-col gap-2 rounded-lg border border-stone-200 bg-stone-50 p-3">
+                      <Label className="text-xs">修正を提案</Label>
+                      <textarea
+                        value={correctionBody}
+                        onChange={(e) => setCorrectionBody(e.target.value)}
+                        placeholder="コード進行やキーの誤りなど、気づいた点を記入してください"
+                        className="min-h-[80px] rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none focus:border-primary resize-none"
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          disabled={!correctionBody.trim() || submittingCorrection}
+                          onClick={async () => {
+                            setSubmittingCorrection(true)
+                            await addCorrection(correctionBody, userId)
+                            setCorrectionBody("")
+                            setShowCorrectionForm(false)
+                            setSubmittingCorrection(false)
+                          }}
+                        >
+                          送信
+                        </Button>
+                        <Button size="sm" variant="outline" className="flex-1" onClick={() => { setShowCorrectionForm(false); setCorrectionBody("") }}>
+                          キャンセル
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => setShowCorrectionForm(true)}>
+                      <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
+                      修正を提案
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {/* 修正リクエスト一覧（モデレーター） */}
+              {userRole === "moderator" && corrections.length > 0 && (
+                <div>
+                  <h4 className="mb-1.5 text-sm font-semibold text-stone-700 flex items-center gap-1">
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    修正リクエスト
+                    <Badge variant="secondary" className="text-xs ml-1">{corrections.length}</Badge>
+                  </h4>
+                  <div className="flex flex-col gap-2">
+                    {corrections.map((c) => (
+                      <div key={c.id} className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-2.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-stone-800 whitespace-pre-wrap">{c.body}</p>
+                          <p className="mt-1 text-xs text-stone-400">
+                            {c.created_at ? new Date(c.created_at).toLocaleDateString("ja-JP") : ""}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeCorrection(c.id)}
+                          className="shrink-0 text-stone-400 hover:text-stone-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* 編集・削除ボタン */}
               {canEdit && (

@@ -190,6 +190,38 @@ export type Database = {
           },
         ]
       }
+      song_corrections: {
+        Row: {
+          id: string
+          song_id: string
+          user_id: string
+          body: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          song_id: string
+          user_id: string
+          body: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          song_id?: string
+          user_id?: string
+          body?: string
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "song_corrections_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       songs: {
         Row: {
           artist: string | null
